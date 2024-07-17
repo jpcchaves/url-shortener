@@ -1,6 +1,6 @@
 package com.challenge.urlshortener.domain.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class UrlResponseDTO {
   private Long id;
@@ -11,7 +11,7 @@ public class UrlResponseDTO {
 
   private Integer accessCount;
 
-  private Date createdAt;
+  private LocalDateTime createdAt;
 
   public UrlResponseDTO() {
   }
@@ -21,7 +21,7 @@ public class UrlResponseDTO {
       String originalUrl,
       String shortUrl,
       Integer accessCount,
-      Date createdAt
+      LocalDateTime createdAt
   ) {
     this.id = id;
     this.originalUrl = originalUrl;
@@ -62,11 +62,11 @@ public class UrlResponseDTO {
     this.accessCount = accessCount;
   }
 
-  public Date getCreatedAt() {
+  public LocalDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(Date createdAt) {
+  public void setCreatedAt(LocalDateTime createdAt) {
     this.createdAt = createdAt;
   }
 }
