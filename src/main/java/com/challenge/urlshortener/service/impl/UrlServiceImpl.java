@@ -46,7 +46,7 @@ public class UrlServiceImpl implements UrlService {
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional
   public UrlResponseDTO getOriginalUrl(String shortUrl) {
 
     UrlEntity url = urlRepository
