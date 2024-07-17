@@ -36,6 +36,7 @@ public class UrlEntity implements Serializable {
   private Integer accessCount = 0;
 
   @CreationTimestamp
+  @Column(updatable = false)
   private LocalDateTime createdAt;
 
   public UrlEntity() {
