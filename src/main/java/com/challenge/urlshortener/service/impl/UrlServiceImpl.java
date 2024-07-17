@@ -1,5 +1,6 @@
 package com.challenge.urlshortener.service.impl;
 
+import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlStatsDTO;
@@ -9,11 +10,14 @@ import com.challenge.urlshortener.repository.UrlRepository;
 import com.challenge.urlshortener.service.UrlService;
 import com.challenge.urlshortener.util.UrlShortenerMapper;
 import com.challenge.urlshortener.util.UrlShortenerUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class UrlServiceImpl implements UrlService {
@@ -77,5 +81,23 @@ public class UrlServiceImpl implements UrlService {
     double averageAccessesPerDay = (double) url.getAccessCount() / daysBetween;
 
     return new UrlStatsDTO(url.getAccessCount(), averageAccessesPerDay);
+  }
+
+  @Override
+  public PaginatedResponseDTO<UrlResponseDTO> getUrlsList(Pageable pageable) {
+
+    Page<UrlEntity> urlEntityList = urlRepository.findAll(pageable);
+
+    List<UrlResponseDTO> urlResponseDTOList = UrlShortenerMapper.toDto(urlEntityList.getContent());
+
+    return new PaginatedResponseDTO<UrlResponseDTO>()
+        .builder()
+        .setContent(urlResponseDTOList)
+        .setPage(urlEntityList.getNumber())
+        .setSize(urlEntityList.getSize())
+        .setTotalElements(urlEntityList.getTotalElements())
+        .setTotalPages(urlEntityList.getTotalPages())
+        .setLast(urlEntityList.isLast())
+        .build();
   }
 }

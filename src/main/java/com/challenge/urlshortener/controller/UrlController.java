@@ -1,11 +1,13 @@
 package com.challenge.urlshortener.controller;
 
+import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlStatsDTO;
 import com.challenge.urlshortener.service.UrlService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +52,13 @@ public class UrlController {
 
   @GetMapping("/{shortUrl}/stats")
   public ResponseEntity<UrlStatsDTO> getUrlStats(@PathVariable(name = "shortUrl") String shortUrl) {
+
     return ResponseEntity.ok(urlService.getUrlStats(shortUrl));
   }
 
+  @GetMapping
+  public ResponseEntity<PaginatedResponseDTO<UrlResponseDTO>> getUrlList(Pageable pageable) {
+
+    return ResponseEntity.ok(urlService.getUrlsList(pageable));
+  }
 }
