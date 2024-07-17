@@ -7,7 +7,7 @@ services:
       TZ: America/Sao_Paulo
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: url-shortener_db
+      POSTGRES_DB: url_shortener_db
     ports:
       - "5436:5432"
     env_file:
@@ -28,7 +28,7 @@ services:
       DB_USERNAME: "${DB_USERNAME}"
       DB_PASSWORD: "${DB_PASSWORD}"
     ports:
-      - "8888:8080"
+      - "8888:8888"
     command: ./gradlew bootRun
     depends_on:
       - database
