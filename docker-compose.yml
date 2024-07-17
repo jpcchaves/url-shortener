@@ -1,0 +1,14 @@
+services:
+  database:
+    image: postgres:15
+    restart: always
+    container_name: urlshortener_db
+    environment:
+      TZ: America/Sao_Paulo
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: urlshortener_db
+    ports:
+      - "5436:5432"
+    env_file:
+      - .env
