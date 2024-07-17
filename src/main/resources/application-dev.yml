@@ -1,0 +1,19 @@
+server:
+  port: 8887
+spring:
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  transaction:
+    rollback-on-commit-failure: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      show_sql: false
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+  web:
+    locale-resolver: fixed
+    locale: pt_BR
