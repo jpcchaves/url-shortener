@@ -2,13 +2,38 @@ services:
   database:
     image: postgres:15
     restart: always
-    container_name: urlshortener_db
+    container_name: url-shortener-db
     environment:
       TZ: America/Sao_Paulo
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: urlshortener_db
+      POSTGRES_DB: url-shortener_db
     ports:
       - "5436:5432"
     env_file:
       - .env
+    networks:
+      - url-shortener-network
+  urlshortener:
+    image: url-shortener
+    container_name: url-shortener
+    restart: always
+    build:
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      TZ: America/Sao_Paulo
+      DB_URL: "${DB_URL}"
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+    ports:
+      - "8888:8080"
+    command: ./gradlew bootRun
+    depends_on:
+      - database
+    networks:
+      - url-shortener-network
+networks:
+  url-shortener-network:
+    driver: bridge
