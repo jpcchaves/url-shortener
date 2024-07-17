@@ -11,12 +11,13 @@ import jakarta.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 
 @Table(name = "urls", indexes = {
-    @Index(name = "short_url_idx", columnList = "short_url")
+    @Index(name = "short_url_idx", columnList = "short_url"),
+    @Index(name = "created_at_idx", columnList = "created_at")
 })
 @Entity
 @SequenceGenerator(name = "seq_url_entity", sequenceName = "seq_url_entity", allocationSize = 1)
@@ -35,7 +36,7 @@ public class UrlEntity implements Serializable {
   private Integer accessCount = 0;
 
   @CreationTimestamp
-  private Date createdAt;
+  private LocalDateTime createdAt;
 
   public UrlEntity() {
   }
@@ -45,7 +46,7 @@ public class UrlEntity implements Serializable {
       String originalUrl,
       String shortUrl,
       Integer accessCount,
-      Date createdAt
+      LocalDateTime createdAt
   ) {
     this.id = id;
     this.originalUrl = originalUrl;
@@ -86,11 +87,11 @@ public class UrlEntity implements Serializable {
     this.accessCount = accessCount;
   }
 
-  public Date getCreatedAt() {
+  public LocalDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(Date createdAt) {
+  public void setCreatedAt(LocalDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
