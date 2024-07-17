@@ -44,7 +44,7 @@ public class UrlServiceImpl implements UrlService {
     url.setOriginalUrl(requestDTO.getOriginalUrl());
     url.setShortUrl(shortUrl);
 
-    UrlEntity savedUrl = urlRepository.save(url);
+    UrlEntity savedUrl = urlRepository.saveAndFlush(url);
 
     return UrlShortenerMapper.toDto(savedUrl);
   }
