@@ -10,6 +10,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -22,6 +23,9 @@ import java.util.Objects;
 @Entity
 @SequenceGenerator(name = "seq_url_entity", sequenceName = "seq_url_entity", allocationSize = 1)
 public class UrlEntity implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = -5595771988486172814L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_url_entity")

@@ -1,8 +1,14 @@
 package com.challenge.urlshortener.domain.dto;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class UrlResponseDTO {
+public class UrlResponseDTO implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 3456859418009760272L;
+
   private Long id;
 
   private String originalUrl;
