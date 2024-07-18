@@ -1,9 +1,14 @@
 package com.challenge.urlshortener.domain.dto;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PaginatedResponseDTO<T> {
+public class PaginatedResponseDTO<T> implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 4917598859451870178L;
+
   private List<T> content = new ArrayList<>();
   private int page;
   private int size;
