@@ -5,6 +5,8 @@ import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlStatsDTO;
 import com.challenge.urlshortener.domain.entity.UrlEntity;
+import com.challenge.urlshortener.exception.ExceptionDefinition;
+import com.challenge.urlshortener.exception.ResourceNotFoundException;
 import com.challenge.urlshortener.factory.UrlFactory;
 import com.challenge.urlshortener.repository.UrlRepository;
 import com.challenge.urlshortener.service.UrlService;
@@ -44,7 +46,7 @@ public class UrlServiceImpl implements UrlService {
     url.setOriginalUrl(requestDTO.getOriginalUrl());
     url.setShortUrl(shortUrl);
 
-    UrlEntity savedUrl = urlRepository.save(url);
+    UrlEntity savedUrl = urlRepository.saveAndFlush(url);
 
     return UrlShortenerMapper.toDto(savedUrl);
   }
@@ -56,7 +58,7 @@ public class UrlServiceImpl implements UrlService {
     UrlEntity url = urlRepository
         .findByShortUrl(shortUrl)
         .orElseThrow(
-            () -> new RuntimeException("Url not found with the given short url: " + shortUrl));
+            () -> new ResourceNotFoundException(ExceptionDefinition.URL0001));
 
     url.setAccessCount(url.getAccessCount() + 1);
 
@@ -70,7 +72,7 @@ public class UrlServiceImpl implements UrlService {
 
     UrlEntity url = urlRepository.findByShortUrl(shortUrl)
                                  .orElseThrow(
-                                     () -> new RuntimeException("Url not found with the given short url: " + shortUrl));
+                                     () -> new ResourceNotFoundException(ExceptionDefinition.URL0001));
 
     LocalDateTime now = LocalDateTime.now();
 
