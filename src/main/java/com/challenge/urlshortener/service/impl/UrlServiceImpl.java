@@ -4,10 +4,12 @@ import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlStatsDTO;
+import com.challenge.urlshortener.domain.entity.UrlAccessEntity;
 import com.challenge.urlshortener.domain.entity.UrlEntity;
 import com.challenge.urlshortener.exception.ExceptionDefinition;
 import com.challenge.urlshortener.exception.ResourceNotFoundException;
 import com.challenge.urlshortener.factory.UrlFactory;
+import com.challenge.urlshortener.repository.UrlAccessRepository;
 import com.challenge.urlshortener.repository.UrlRepository;
 import com.challenge.urlshortener.service.UrlService;
 import com.challenge.urlshortener.util.UrlShortenerMapper;
@@ -17,21 +19,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UrlServiceImpl implements UrlService {
 
   private final UrlRepository urlRepository;
+  private final UrlAccessRepository urlAccessRepository;
   private final UrlFactory urlFactory;
 
   public UrlServiceImpl(
       UrlRepository urlRepository,
+      UrlAccessRepository urlAccessRepository,
       UrlFactory urlFactory
   ) {
     this.urlRepository = urlRepository;
+    this.urlAccessRepository = urlAccessRepository;
     this.urlFactory = urlFactory;
   }
 
@@ -60,29 +65,22 @@ public class UrlServiceImpl implements UrlService {
         .orElseThrow(
             () -> new ResourceNotFoundException(ExceptionDefinition.URL0001));
 
-    url.setAccessCount(url.getAccessCount() + 1);
-
-    urlRepository.save(url);
+    recordAccess(url);
 
     return UrlShortenerMapper.toDto(url);
   }
 
   @Override
   public UrlStatsDTO getUrlStats(String shortUrl) {
-
     UrlEntity url = urlRepository.findByShortUrl(shortUrl)
                                  .orElseThrow(
                                      () -> new ResourceNotFoundException(ExceptionDefinition.URL0001));
 
-    LocalDateTime now = LocalDateTime.now();
-
-    Duration duration = Duration.between(url.getCreatedAt(), now);
-
-    long daysBetween = Math.max(duration.toDays(), 1);
-
-    double averageAccessesPerDay = (double) url.getAccessCount() / daysBetween;
-
-    return new UrlStatsDTO(url.getAccessCount(), averageAccessesPerDay);
+    return new UrlStatsDTO(
+        url.getOriginalUrl(),
+        url.getShortUrl(),
+        url.getAccessLogs()
+    );
   }
 
   @Override
@@ -90,7 +88,8 @@ public class UrlServiceImpl implements UrlService {
 
     Page<UrlEntity> urlEntityList = urlRepository.findAll(pageable);
 
-    List<UrlResponseDTO> urlResponseDTOList = UrlShortenerMapper.toDto(urlEntityList.getContent());
+    List<UrlResponseDTO> urlResponseDTOList =
+        UrlShortenerMapper.toDto(urlEntityList.getContent());
 
     return new PaginatedResponseDTO<UrlResponseDTO>()
         .builder()
@@ -101,5 +100,29 @@ public class UrlServiceImpl implements UrlService {
         .setTotalPages(urlEntityList.getTotalPages())
         .setLast(urlEntityList.isLast())
         .build();
+  }
+
+  @Override
+  public void recordAccess(UrlEntity url) {
+
+    LocalDate today = LocalDate.now();
+
+    Optional<UrlAccessEntity> urlAccessOptional =
+        urlAccessRepository.findByUrlAndAccessDate(url.getId(), today);
+
+    UrlAccessEntity urlAccess;
+
+    if (urlAccessOptional.isPresent()) {
+
+      urlAccess = urlAccessOptional.get();
+
+      urlAccess.setAccessCount(urlAccess.getAccessCount() + 1);
+
+    } else {
+
+      urlAccess = new UrlAccessEntity(url, today, 1);
+    }
+
+    urlAccessRepository.save(urlAccess);
   }
 }
