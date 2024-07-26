@@ -12,7 +12,6 @@ public class UrlShortenerMapper {
         urlEntity.getId(),
         urlEntity.getOriginalUrl(),
         urlEntity.getShortUrl(),
-        urlEntity.getAccessCount(),
         urlEntity.getCreatedAt()
     );
   }

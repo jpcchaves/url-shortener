@@ -1,33 +1,49 @@
 package com.challenge.urlshortener.domain.dto;
 
+import com.challenge.urlshortener.domain.entity.UrlAccessEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class UrlStatsDTO {
-  private Integer accessCount;
-  private Double averageAccessPerDay;
+  private String originalUrl;
+  private String shortenedUrl;
+  private List<UrlAccessEntity> accessLogs = new ArrayList<>();
 
   public UrlStatsDTO() {
   }
 
   public UrlStatsDTO(
-      Integer accessCount,
-      Double averageAccessPerDay
+      String originalUrl,
+      String shortenedUrl,
+      List<UrlAccessEntity> accessLogs
   ) {
-    this.accessCount = accessCount;
-    this.averageAccessPerDay = averageAccessPerDay;
+    this.originalUrl = originalUrl;
+    this.shortenedUrl = shortenedUrl;
+    this.accessLogs = accessLogs;
   }
 
-  public Integer getAccessCount() {
-    return accessCount;
+  public String getOriginalUrl() {
+    return originalUrl;
   }
 
-  public void setAccessCount(Integer accessCount) {
-    this.accessCount = accessCount;
+  public void setOriginalUrl(String originalUrl) {
+    this.originalUrl = originalUrl;
   }
 
-  public Double getAverageAccessPerDay() {
-    return averageAccessPerDay;
+  public String getShortenedUrl() {
+    return shortenedUrl;
   }
 
-  public void setAverageAccessPerDay(Double averageAccessPerDay) {
-    this.averageAccessPerDay = averageAccessPerDay;
+  public void setShortenedUrl(String shortenedUrl) {
+    this.shortenedUrl = shortenedUrl;
+  }
+
+  public List<UrlAccessEntity> getAccessLogs() {
+    return accessLogs;
+  }
+
+  public void setAccessLogs(List<UrlAccessEntity> accessLogs) {
+    this.accessLogs = accessLogs;
   }
 }

@@ -15,8 +15,6 @@ public class UrlResponseDTO implements Serializable {
 
   private String shortUrl;
 
-  private Integer accessCount;
-
   private LocalDateTime createdAt;
 
   public UrlResponseDTO() {
@@ -26,13 +24,11 @@ public class UrlResponseDTO implements Serializable {
       Long id,
       String originalUrl,
       String shortUrl,
-      Integer accessCount,
       LocalDateTime createdAt
   ) {
     this.id = id;
     this.originalUrl = originalUrl;
     this.shortUrl = shortUrl;
-    this.accessCount = accessCount;
     this.createdAt = createdAt;
   }
 
@@ -59,14 +55,7 @@ public class UrlResponseDTO implements Serializable {
   public void setShortUrl(String shortUrl) {
     this.shortUrl = shortUrl;
   }
-
-  public Integer getAccessCount() {
-    return accessCount;
-  }
-
-  public void setAccessCount(Integer accessCount) {
-    this.accessCount = accessCount;
-  }
+  
 
   public LocalDateTime getCreatedAt() {
     return createdAt;
