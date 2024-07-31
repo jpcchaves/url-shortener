@@ -72,6 +72,7 @@ public class UrlAccessEntity implements Serializable {
     this.accessCount = accessCount;
   }
 
+
   public Long getId() {
     return id;
   }

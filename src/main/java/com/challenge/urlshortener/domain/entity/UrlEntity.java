@@ -72,6 +72,18 @@ public class UrlEntity implements Serializable {
     this.createdAt = createdAt;
   }
 
+  public UrlEntity(
+      String originalUrl,
+      String shortUrl,
+      List<UrlAccessEntity> accessLogs,
+      LocalDateTime createdAt
+  ) {
+    this.originalUrl = originalUrl;
+    this.shortUrl = shortUrl;
+    this.accessLogs = accessLogs;
+    this.createdAt = createdAt;
+  }
+
   public Long getId() {
     return id;
   }
