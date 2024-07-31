@@ -58,6 +58,36 @@ public class UrlServiceImpl implements UrlService {
 
   @Override
   @Transactional
+  public UrlResponseDTO updateUrl(
+      Long urlId,
+      UrlRequestDTO requestDTO
+  ) {
+
+    UrlEntity urlEntity = urlRepository
+        .findById(urlId)
+        .orElseThrow(
+            () -> new ResourceNotFoundException(ExceptionDefinition.URL0002));
+
+    urlEntity.setOriginalUrl(requestDTO.getOriginalUrl());
+
+    urlEntity = urlRepository.saveAndFlush(urlEntity);
+
+    return UrlShortenerMapper.toDto(urlEntity);
+  }
+
+  @Override
+  public void deleteUrl(Long urlId) {
+
+    UrlEntity urlEntity = urlRepository
+        .findById(urlId)
+        .orElseThrow(
+            () -> new ResourceNotFoundException(ExceptionDefinition.URL0002));
+
+    urlRepository.deleteById(urlEntity.getId());
+  }
+
+  @Override
+  @Transactional
   public UrlResponseDTO getOriginalUrl(String shortUrl) {
 
     UrlEntity url = urlRepository
@@ -102,8 +132,7 @@ public class UrlServiceImpl implements UrlService {
         .build();
   }
 
-  @Override
-  public void recordAccess(UrlEntity url) {
+  private void recordAccess(UrlEntity url) {
 
     LocalDate today = LocalDate.now();
 

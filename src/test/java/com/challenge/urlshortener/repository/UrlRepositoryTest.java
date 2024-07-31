@@ -2,6 +2,7 @@ package com.challenge.urlshortener.repository;
 
 import com.challenge.urlshortener.domain.entity.UrlEntity;
 import com.challenge.urlshortener.util.UrlShortenerUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,14 +23,21 @@ class UrlRepositoryTest {
   @Autowired
   private UrlRepository urlRepository;
 
+  private String originalUrl;
+  private String shortUrl;
+
+  @BeforeEach
+  void setup() {
+
+    originalUrl = "http://localhost:3000";
+    shortUrl = UrlShortenerUtil.generateShortUrl();
+  }
+
   @DisplayName("Given URL Object when saved then return saved URL")
   @Test
   void testGivenUrlObject_WhenSave_thenReturnSavedUrl() {
 
     // Given
-    String originalUrl = "http://localhost:3000";
-    String shortUrl = UrlShortenerUtil.generateShortUrl();
-
     UrlEntity url = new UrlEntity(
         originalUrl,
         shortUrl
@@ -64,9 +73,6 @@ class UrlRepositoryTest {
   void testGivenUrlListPaginated_WhenFindAll_ThenReturnUrlListPaginated() {
 
     // Given
-    String originalUrl = "http://localhost:3000";
-    String shortUrl = UrlShortenerUtil.generateShortUrl();
-
     int pageNumber = 0;
     int pageSize = 20;
     Sort sort = Sort.by(Sort.DEFAULT_DIRECTION, "id");
@@ -112,9 +118,6 @@ class UrlRepositoryTest {
   void testGivenShortUrl_WhenFindByShortUrl_ThenReturnUrlObjectOrException() {
 
     // Given
-    String originalUrl = "http://localhost:3000";
-    String shortUrl = UrlShortenerUtil.generateShortUrl();
-
     UrlEntity url = new UrlEntity(
         originalUrl,
         shortUrl
@@ -138,5 +141,55 @@ class UrlRepositoryTest {
     assertEquals(fetchedUrl.getShortUrl(), shortUrl, "Expect OriginalUrl " +
         "match " +
         "the given OriginalUrl");
+  }
+
+  @DisplayName("Test given Url when updateUrl should return updated " +
+      "Url object")
+  @Test
+  void testGivenUrlObjectWhenUpdateUrlShouldReturnUpdatedUrlObject() {
+
+    // Given
+    String updatedOriginalUrl = "https://localhost:3333";
+
+    UrlEntity url = new UrlEntity(
+        originalUrl,
+        shortUrl
+    );
+
+    UrlEntity savedUrl = urlRepository.save(url);
+
+    // When
+    savedUrl.setOriginalUrl(updatedOriginalUrl);
+
+    UrlEntity updatedUrl = urlRepository.save(url);
+
+    // Then
+    assertNotNull(updatedUrl);
+
+    assertNotEquals(updatedUrl.getOriginalUrl(), originalUrl);
+
+    assertEquals(updatedUrl.getOriginalUrl(), updatedOriginalUrl);
+  }
+
+  @DisplayName("Test given urlId when deleteUrl should return empty optional")
+  @Test
+  void testGivenUrlIdWhenDeleteUrlShouldReturnEmptyOptional() {
+
+    // Given
+    UrlEntity url = new UrlEntity(
+        originalUrl,
+        shortUrl
+    );
+
+    UrlEntity savedUrl = urlRepository.saveAndFlush(url);
+
+    // When
+    urlRepository.deleteById(savedUrl.getId());
+
+    Optional<UrlEntity> optionalUrlEntity =
+        urlRepository.findById(savedUrl.getId());
+
+    // Then
+    assertTrue(optionalUrlEntity.isEmpty());
   }
 }
