@@ -45,7 +45,7 @@ public class UrlAccessEntity implements Serializable {
   @JsonIgnore
   private UrlEntity url;
   private LocalDate accessDate;
-  private Integer accessCount;
+  private Integer accessCount = 0;
 
   public UrlAccessEntity() {
   }
@@ -71,6 +71,7 @@ public class UrlAccessEntity implements Serializable {
     this.accessDate = accessDate;
     this.accessCount = accessCount;
   }
+
 
   public Long getId() {
     return id;
