@@ -117,7 +117,6 @@ class UrlRepositoryTest {
   void testGivenShortUrl_WhenFindByShortUrl_ThenReturnUrlObjectOrException() {
 
     // Given
-
     UrlEntity url = new UrlEntity(
         originalUrl,
         shortUrl
@@ -141,5 +140,33 @@ class UrlRepositoryTest {
     assertEquals(fetchedUrl.getShortUrl(), shortUrl, "Expect OriginalUrl " +
         "match " +
         "the given OriginalUrl");
+  }
+
+  @DisplayName("Test given Url when updateUrl should return updated " +
+      "Url object")
+  @Test
+  void testGivenUrlObjectWhenUpdateUrlShouldReturnUpdatedUrlObject() {
+
+    // Given
+    String updatedOriginalUrl = "https://localhost:3333";
+
+    UrlEntity url = new UrlEntity(
+        originalUrl,
+        shortUrl
+    );
+
+    UrlEntity savedUrl = urlRepository.save(url);
+
+    // When
+    savedUrl.setOriginalUrl(updatedOriginalUrl);
+
+    UrlEntity updatedUrl = urlRepository.save(url);
+
+    // Then
+    assertNotNull(updatedUrl);
+
+    assertNotEquals(updatedUrl.getOriginalUrl(), originalUrl);
+
+    assertEquals(updatedUrl.getOriginalUrl(), updatedOriginalUrl);
   }
 }
