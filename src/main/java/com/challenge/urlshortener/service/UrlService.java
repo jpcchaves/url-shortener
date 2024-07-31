@@ -10,6 +10,11 @@ public interface UrlService {
 
   UrlResponseDTO shortenUrl(UrlRequestDTO requestDTO);
 
+  UrlResponseDTO updateUrl(
+      Long urlId,
+      UrlRequestDTO requestDTO
+  );
+
   UrlResponseDTO getOriginalUrl(String shortUrl);
 
   UrlStatsDTO getUrlStats(String shortUrl);
