@@ -17,6 +17,7 @@ import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -89,6 +90,27 @@ public class UrlController {
       @RequestBody UrlRequestDTO requestDTO
   ) {
     return ResponseEntity.ok(urlService.updateUrl(urlId, requestDTO));
+  }
+
+  @Operation(
+      summary = "Deletes a URL",
+      description = "Deletes a URL by passing the urlId as a path variable.",
+      responses = {
+          @ApiResponse(
+              description = "No Content",
+              responseCode = "204",
+              content = @Content),
+          @ApiResponse(
+              description = "Not Found",
+              responseCode = "404",
+              content = @Content)
+      })
+  @DeleteMapping("/{urlId}")
+  public ResponseEntity<Void> deleteUrl(@PathVariable(name = "urlId") Long urlId) {
+
+    urlService.deleteUrl(urlId);
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Operation(
