@@ -102,8 +102,7 @@ public class UrlServiceImpl implements UrlService {
         .build();
   }
 
-  @Override
-  public void recordAccess(UrlEntity url) {
+  private void recordAccess(UrlEntity url) {
 
     LocalDate today = LocalDate.now();
 

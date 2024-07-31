@@ -4,7 +4,6 @@ import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlStatsDTO;
-import com.challenge.urlshortener.domain.entity.UrlEntity;
 import org.springframework.data.domain.Pageable;
 
 public interface UrlService {
@@ -17,5 +16,4 @@ public interface UrlService {
 
   PaginatedResponseDTO<UrlResponseDTO> getUrlsList(Pageable pageable);
 
-  void recordAccess(UrlEntity url);
 }
