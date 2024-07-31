@@ -62,7 +62,40 @@ class UrlAccessRepositoryTest {
     assertEquals(savedUrlAccess.getUrl(), url);
 
     assertTrue(updatedAccessCount > prevAccessCount);
-    
+
     assertEquals(updatedAccessCount, savedUrlAccess.getAccessCount());
+  }
+
+  @DisplayName("test Given Url Access Object When findByUrlAndAccessDate then" +
+      " Return Url Access Object")
+  @Test
+  void testGivenUrlAccessObject_WhenFindByUrlAndAccessDate_thenReturnUrlAccessObject() {
+
+    // Given
+    UrlAccessEntity urlAccessEntity = new UrlAccessEntity();
+
+    LocalDate accessDate = LocalDate.now();
+
+    Integer prevAccessCount = urlAccessEntity.getAccessCount();
+    Integer updatedAccessCount = prevAccessCount + 1;
+
+    urlAccessEntity.setAccessCount(updatedAccessCount);
+    urlAccessEntity.setUrl(url);
+    urlAccessEntity.setAccessDate(accessDate);
+
+    UrlAccessEntity savedUrlAccess =
+        urlAccessRepository.saveAndFlush(urlAccessEntity);
+
+    // When
+    UrlAccessEntity fetchedUrlAccess =
+        urlAccessRepository
+            .findByUrlAndAccessDate(
+                savedUrlAccess.getId(),
+                accessDate
+            )
+            .get();
+
+    // Then
+    assertNotNull(fetchedUrlAccess);
   }
 }
