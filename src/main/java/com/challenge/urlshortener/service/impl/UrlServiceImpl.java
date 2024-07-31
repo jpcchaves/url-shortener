@@ -76,6 +76,17 @@ public class UrlServiceImpl implements UrlService {
   }
 
   @Override
+  public void deleteUrl(Long urlId) {
+
+    UrlEntity urlEntity = urlRepository
+        .findById(urlId)
+        .orElseThrow(
+            () -> new ResourceNotFoundException(ExceptionDefinition.URL0002));
+
+    urlRepository.deleteById(urlEntity.getId());
+  }
+
+  @Override
   @Transactional
   public UrlResponseDTO getOriginalUrl(String shortUrl) {
 

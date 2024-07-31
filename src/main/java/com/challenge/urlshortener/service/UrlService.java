@@ -15,6 +15,8 @@ public interface UrlService {
       UrlRequestDTO requestDTO
   );
 
+  void deleteUrl(Long urlId);
+
   UrlResponseDTO getOriginalUrl(String shortUrl);
 
   UrlStatsDTO getUrlStats(String shortUrl);
