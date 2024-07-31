@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -168,5 +169,27 @@ class UrlRepositoryTest {
     assertNotEquals(updatedUrl.getOriginalUrl(), originalUrl);
 
     assertEquals(updatedUrl.getOriginalUrl(), updatedOriginalUrl);
+  }
+
+  @DisplayName("Test given urlId when deleteUrl should return empty optional")
+  @Test
+  void testGivenUrlIdWhenDeleteUrlShouldReturnEmptyOptional() {
+
+    // Given
+    UrlEntity url = new UrlEntity(
+        originalUrl,
+        shortUrl
+    );
+
+    UrlEntity savedUrl = urlRepository.saveAndFlush(url);
+
+    // When
+    urlRepository.deleteById(savedUrl.getId());
+
+    Optional<UrlEntity> optionalUrlEntity =
+        urlRepository.findById(savedUrl.getId());
+
+    // Then
+    assertTrue(optionalUrlEntity.isEmpty());
   }
 }
