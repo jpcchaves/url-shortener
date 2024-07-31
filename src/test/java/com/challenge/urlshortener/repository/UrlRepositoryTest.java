@@ -105,4 +105,38 @@ class UrlRepositoryTest {
 
     assertTrue(urlEntitiesPage.isLast());
   }
+
+  @DisplayName("test Given Short Url When Find By Short Url Then Return Url " +
+      "Object Or Exception")
+  @Test
+  void testGivenShortUrl_WhenFindByShortUrl_ThenReturnUrlObjectOrException() {
+
+    // Given
+    String originalUrl = "http://localhost:3000";
+    String shortUrl = UrlShortenerUtil.generateShortUrl();
+
+    UrlEntity url = new UrlEntity(
+        originalUrl,
+        shortUrl
+    );
+
+    urlRepository.save(url);
+
+    // When
+    UrlEntity fetchedUrl = urlRepository.findByShortUrl(shortUrl)
+                                        .get();
+
+    // Then
+    assertNotNull(fetchedUrl);
+
+    assertNotNull(fetchedUrl.getCreatedAt(), "Expect createdAt not to be null");
+
+    assertEquals(fetchedUrl.getOriginalUrl(), originalUrl, "Expect " +
+        "OriginalUrl " +
+        "match the given OriginalUrl");
+
+    assertEquals(fetchedUrl.getShortUrl(), shortUrl, "Expect OriginalUrl " +
+        "match " +
+        "the given OriginalUrl");
+  }
 }
