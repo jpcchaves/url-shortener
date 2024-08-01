@@ -17,14 +17,7 @@ import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -114,20 +107,11 @@ public class UrlController {
   }
 
   @Operation(
-      summary = "Access a url",
-      description =
-          "Access the original URL by passing the shortened URL",
-      responses = {
-          @ApiResponse(
-              description = "Success",
-              responseCode = "200",
-              content = @Content
-          ),
-          @ApiResponse(
-              description = "Bad Request",
-              responseCode = "400",
-              content = @Content)
-      })
+          summary = "Redirect to the original URL",
+          responses = {
+                  @ApiResponse(responseCode = "302", description = "Redirect to the original URL"),
+                    @ApiResponse(responseCode = "404", description = "URL not found")
+  })
   @GetMapping("/{shortUrl}")
   public void redirectUrl(
       @PathVariable(name = "shortUrl") String shortUrl,
