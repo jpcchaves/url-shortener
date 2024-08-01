@@ -17,9 +17,17 @@ import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.net.URI;
 
 @Tag(name = "Url Controller")
 @RestController
@@ -107,21 +115,23 @@ public class UrlController {
   }
 
   @Operation(
-          summary = "Redirect to the original URL",
-          responses = {
-                  @ApiResponse(responseCode = "302", description = "Redirect to the original URL"),
-                    @ApiResponse(responseCode = "404", description = "URL not found")
-  })
+      summary = "Redirect to the original URL",
+      responses = {
+          @ApiResponse(responseCode = "302", description = "Redirect to the " +
+              "original URL"),
+          @ApiResponse(responseCode = "404", description = "URL not found")
+      })
   @GetMapping("/{shortUrl}")
-  public void redirectUrl(
+  public ResponseEntity<Void> redirectUrl(
       @PathVariable(name = "shortUrl") String shortUrl,
       HttpServletResponse response
   ) throws IOException {
 
     UrlResponseDTO responseDTO = urlService.getOriginalUrl(shortUrl);
 
-    response.sendRedirect(responseDTO.getOriginalUrl());
-
+    return ResponseEntity.status(HttpStatus.FOUND)
+                         .location(URI.create(responseDTO.getOriginalUrl()))
+                         .build();
   }
 
   @Operation(
