@@ -1,5 +1,6 @@
 package com.challenge.urlshortener.service.impl;
 
+import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
 import com.challenge.urlshortener.domain.entity.UrlEntity;
@@ -13,9 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -32,7 +35,19 @@ class UrlServiceImplTest {
     private UrlEntity urlEntity;
 
     private String originalUrl;
+
     private String shortUrl;
+
+    private Pageable pageRequest;
+
+    int page;
+
+    int pageSize;
+
+    private Sort sort;
+
+    private Page<UrlEntity> urlEntityPage;
+
     private UrlRequestDTO urlRequestDTO;
 
     @InjectMocks
@@ -45,6 +60,24 @@ class UrlServiceImplTest {
         originalUrl = "https://www.google.com";
         shortUrl = UrlShortenerUtil.generateShortUrl();
         LocalDateTime createdAt = LocalDateTime.now();
+
+        sort = Sort.by(Sort.Direction.ASC, "createdAt");
+        page = 0;
+        pageSize = 10;
+
+        pageRequest = PageRequest.of(page, pageSize, sort);
+
+        List<UrlEntity> urlEntityList = List.of(
+                new UrlEntity(1L, "https://test.com/", "short1",
+                        LocalDateTime.now()),
+                new UrlEntity(2L, "https://test.com/", "short2",
+                        LocalDateTime.now()),
+                new UrlEntity(3L, "https://test.com/", "short3",
+                        LocalDateTime.now())
+        );
+
+        urlEntityPage = new PageImpl<>(urlEntityList, pageRequest,
+                urlEntityList.size());
 
         urlRequestDTO = new UrlRequestDTO(originalUrl);
 
@@ -77,6 +110,28 @@ class UrlServiceImplTest {
         assertEquals(urlResponseDTO.getOriginalUrl(), originalUrl);
         assertEquals(urlResponseDTO.getShortUrl(), urlEntity.getShortUrl());
         assertNotNull(urlResponseDTO.getCreatedAt());
+    }
+
+    @DisplayName("Test given pagination pararmeters when list urls should " +
+            "return PaginatedResponseDTO")
+    @Test
+    void testGivenPaginationParameters_WhenListUrls_ShouldReturnPaginatedResponseDTO () {
+        // Given / Arrange
+        given(urlRepository.findAll(pageRequest)).willReturn(urlEntityPage);
+
+        // When / Act
+        PaginatedResponseDTO<UrlResponseDTO> paginatedResponseDTO =
+                urlService.getUrlsList(pageRequest);
+
+        // Then / Assert
+        assertNotNull(paginatedResponseDTO);
+
+        assertEquals(3, paginatedResponseDTO.getTotalElements());
+        assertEquals(10, urlEntityPage.getSize());
+        assertEquals(3, urlEntityPage.getNumberOfElements());
+        assertEquals(1, urlEntityPage.getTotalPages());
+        assertEquals(0, urlEntityPage.getNumber());
+        assertTrue(urlEntityPage.hasContent());
     }
 
 }
