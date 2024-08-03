@@ -7,6 +7,7 @@ import com.challenge.urlshortener.domain.entity.UrlEntity;
 import com.challenge.urlshortener.factory.UrlFactory;
 import com.challenge.urlshortener.repository.UrlRepository;
 import com.challenge.urlshortener.util.UrlShortenerUtil;
+import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,19 +32,22 @@ class UrlServiceImplTest {
     @Mock
     private UrlFactory urlFactory;
 
+    private Faker faker = new Faker();
+
     private UrlEntity urlEntity;
 
     private String originalUrl;
 
     private String shortUrl;
 
-    private Pageable pageRequest;
+    private final int page = 0;
 
-    int page;
+    private final int pageSize = 10;
 
-    int pageSize;
+    private Sort sort = Sort.by(Sort.Direction.ASC, "createdAt");
 
-    private Sort sort;
+    private final Pageable pageRequest = PageRequest.of(page, pageSize, sort);
+
 
     private Page<UrlEntity> urlEntityPage;
 
@@ -56,23 +59,18 @@ class UrlServiceImplTest {
     @BeforeEach
     public void setUp() {
 
-        long id = new Date().getTime();
-        originalUrl = "https://www.google.com";
+        long id = faker.number().randomNumber();
+        originalUrl = faker.internet().url();
         shortUrl = UrlShortenerUtil.generateShortUrl();
         LocalDateTime createdAt = LocalDateTime.now();
 
-        sort = Sort.by(Sort.Direction.ASC, "createdAt");
-        page = 0;
-        pageSize = 10;
-
-        pageRequest = PageRequest.of(page, pageSize, sort);
-
         List<UrlEntity> urlEntityList = List.of(
-                new UrlEntity(1L, "https://test.com/", "short1",
+                new UrlEntity(faker.number().randomNumber(),
+                        faker.internet().url(), faker.random().hex(8),
                         LocalDateTime.now()),
-                new UrlEntity(2L, "https://test.com/", "short2",
+                new UrlEntity(faker.number().randomNumber(), faker.internet().url(), faker.random().hex(8),
                         LocalDateTime.now()),
-                new UrlEntity(3L, "https://test.com/", "short3",
+                new UrlEntity(faker.number().randomNumber(), faker.internet().url(), faker.random().hex(8),
                         LocalDateTime.now())
         );
 
