@@ -92,6 +92,13 @@ public class UrlEntity implements Serializable {
     this.shortUrl = shortUrl;
   }
 
+  public UrlEntity(Long id, String originalUrl, String shortUrl, LocalDateTime createdAt) {
+    this.id = id;
+    this.originalUrl = originalUrl;
+    this.shortUrl = shortUrl;
+    this.createdAt = createdAt;
+  }
+
   public Long getId() {
     return id;
   }

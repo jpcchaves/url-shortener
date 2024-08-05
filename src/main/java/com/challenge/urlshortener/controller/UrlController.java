@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.net.URI;
 
 @Tag(name = "Url Controller")
 @RestController
@@ -114,30 +115,23 @@ public class UrlController {
   }
 
   @Operation(
-      summary = "Access a url",
-      description =
-          "Access the original URL by passing the shortened URL",
+      summary = "Redirect to the original URL",
       responses = {
-          @ApiResponse(
-              description = "Success",
-              responseCode = "200",
-              content = @Content
-          ),
-          @ApiResponse(
-              description = "Bad Request",
-              responseCode = "400",
-              content = @Content)
+          @ApiResponse(responseCode = "302", description = "Redirect to the " +
+              "original URL"),
+          @ApiResponse(responseCode = "404", description = "URL not found")
       })
   @GetMapping("/{shortUrl}")
-  public void redirectUrl(
+  public ResponseEntity<Void> redirectUrl(
       @PathVariable(name = "shortUrl") String shortUrl,
       HttpServletResponse response
   ) throws IOException {
 
     UrlResponseDTO responseDTO = urlService.getOriginalUrl(shortUrl);
 
-    response.sendRedirect(responseDTO.getOriginalUrl());
-
+    return ResponseEntity.status(HttpStatus.FOUND)
+                         .location(URI.create(responseDTO.getOriginalUrl()))
+                         .build();
   }
 
   @Operation(
