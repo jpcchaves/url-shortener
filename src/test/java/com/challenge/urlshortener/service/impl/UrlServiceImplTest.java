@@ -74,7 +74,7 @@ class UrlServiceImplTest {
         urlEntity = new UrlEntity(id, originalUrl, shortUrl, createdAt);
     }
 
-    @DisplayName("Test Given UrlRequestDTO When Save Should Return " + "UrlResponseDTO")
+    @DisplayName("Test Given UrlRequestDTO When Save Should Return UrlResponseDTO")
     @Test
     void testGivenUrlRequestDTO_WhenSave_ShouldReturnUrlResponseDTO() {
 
@@ -92,26 +92,6 @@ class UrlServiceImplTest {
         assertEquals(urlResponseDTO.getOriginalUrl(), originalUrl);
         assertEquals(urlResponseDTO.getShortUrl(), urlEntity.getShortUrl());
         assertNotNull(urlResponseDTO.getCreatedAt());
-    }
-
-    @DisplayName("Test given pagination pararmeters when list urls should " + "return PaginatedResponseDTO")
-    @Test
-    void testGivenPaginationParameters_WhenListUrls_ShouldReturnPaginatedResponseDTO() {
-        // Given / Arrange
-        given(urlRepository.findAll(pageRequest)).willReturn(urlEntityPage);
-
-        // When / Act
-        PaginatedResponseDTO<UrlResponseDTO> paginatedResponseDTO = urlService.getUrlsList(pageRequest);
-
-        // Then / Assert
-        assertNotNull(paginatedResponseDTO);
-
-        assertEquals(3, paginatedResponseDTO.getTotalElements());
-        assertEquals(10, urlEntityPage.getSize());
-        assertEquals(3, urlEntityPage.getNumberOfElements());
-        assertEquals(1, urlEntityPage.getTotalPages());
-        assertEquals(0, urlEntityPage.getNumber());
-        assertTrue(urlEntityPage.hasContent());
     }
 
     @DisplayName(
@@ -137,4 +117,27 @@ class UrlServiceImplTest {
         assertEquals(updatedUrl, urlResponseDTO.getOriginalUrl());
         assertEquals(urlEntity.getShortUrl(), urlResponseDTO.getShortUrl());
     }
+
+    @DisplayName("Test given pagination parameters when list urls should " +
+            "return PaginatedResponseDTO")
+    @Test
+    void testGivenPaginationParameters_WhenListUrls_ShouldReturnPaginatedResponseDTO() {
+        // Given / Arrange
+        given(urlRepository.findAll(pageRequest)).willReturn(urlEntityPage);
+
+        // When / Act
+        PaginatedResponseDTO<UrlResponseDTO> paginatedResponseDTO = urlService.getUrlsList(pageRequest);
+
+        // Then / Assert
+        assertNotNull(paginatedResponseDTO);
+
+        assertEquals(3, paginatedResponseDTO.getTotalElements());
+        assertEquals(10, urlEntityPage.getSize());
+        assertEquals(3, urlEntityPage.getNumberOfElements());
+        assertEquals(1, urlEntityPage.getTotalPages());
+        assertEquals(0, urlEntityPage.getNumber());
+        assertTrue(urlEntityPage.hasContent());
+    }
+
+
 }
