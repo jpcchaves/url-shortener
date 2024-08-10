@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
+import com.challenge.urlshortener.domain.dto.UrlStatsDTO;
 import com.challenge.urlshortener.domain.entity.UrlAccessEntity;
 import com.challenge.urlshortener.domain.entity.UrlEntity;
 import com.challenge.urlshortener.factory.UrlFactory;
@@ -214,5 +215,28 @@ class UrlServiceImplTest {
     assertEquals(urlEntity.getOriginalUrl(), response.getOriginalUrl());
     assertEquals(urlEntity.getShortUrl(), response.getShortUrl());
     assertEquals(urlEntity.getCreatedAt(), response.getCreatedAt());
+  }
+
+  @DisplayName(
+      "Test given short url when get url stats then should return UrlStatsDTO"
+          + " with current url stats")
+  @Test
+  void
+      testGivenShortUrl_WhenGetUrlStats_ThenShouldReturnUrlStatsDTOWihCurrentUrlStats() {
+
+    // Given / Arrange
+    urlEntity.setAccessLogs(List.of(urlAccess));
+
+    given(urlRepository.findByShortUrl(urlEntity.getShortUrl()))
+        .willReturn(Optional.of(urlEntity));
+
+    // When / Act
+    UrlStatsDTO urlStatsDTO = urlService.getUrlStats(urlEntity.getShortUrl());
+
+    // Then / Assert
+    assertNotNull(urlStatsDTO);
+    assertEquals(1, urlStatsDTO.getAccessLogs().size());
+    assertEquals(urlEntity.getOriginalUrl(), urlStatsDTO.getOriginalUrl());
+    assertEquals(urlEntity.getShortUrl(), urlStatsDTO.getShortenedUrl());
   }
 }
