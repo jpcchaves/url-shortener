@@ -1,12 +1,26 @@
 package com.challenge.urlshortener.service.impl;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
+import com.challenge.urlshortener.domain.dto.UrlStatsDTO;
+import com.challenge.urlshortener.domain.entity.UrlAccessEntity;
 import com.challenge.urlshortener.domain.entity.UrlEntity;
 import com.challenge.urlshortener.factory.UrlFactory;
+import com.challenge.urlshortener.repository.UrlAccessRepository;
 import com.challenge.urlshortener.repository.UrlRepository;
 import com.challenge.urlshortener.util.UrlShortenerUtil;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,119 +31,212 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-
 @ExtendWith(MockitoExtension.class)
 class UrlServiceImplTest {
 
-    @Mock
-    private UrlRepository urlRepository;
+  private final int page = 0;
 
-    @Mock
-    private UrlFactory urlFactory;
+  private final int pageSize = 10;
 
-    private Faker faker = new Faker();
+  private final Faker faker = new Faker();
 
-    private UrlEntity urlEntity;
+  private final Sort sort = Sort.by(Sort.Direction.ASC, "createdAt");
 
-    private String originalUrl;
+  private final Pageable pageRequest = PageRequest.of(page, pageSize, sort);
 
-    private String shortUrl;
+  @Mock private UrlRepository urlRepository;
 
-    private final int page = 0;
+  @Mock private UrlFactory urlFactory;
 
-    private final int pageSize = 10;
+  @Mock private UrlAccessRepository urlAccessRepository;
 
-    private Sort sort = Sort.by(Sort.Direction.ASC, "createdAt");
+  @InjectMocks private UrlServiceImpl urlService;
 
-    private final Pageable pageRequest = PageRequest.of(page, pageSize, sort);
+  private UrlEntity urlEntity;
 
+  private String originalUrl;
 
-    private Page<UrlEntity> urlEntityPage;
+  private String shortUrl;
 
-    private UrlRequestDTO urlRequestDTO;
+  private Page<UrlEntity> urlEntityPage;
 
-    @InjectMocks
-    private UrlServiceImpl urlService;
+  private UrlRequestDTO urlRequestDTO;
 
-    @BeforeEach
-    public void setUp() {
+  private UrlAccessEntity urlAccess;
 
-        long id = faker.number().randomNumber();
-        originalUrl = faker.internet().url();
-        shortUrl = UrlShortenerUtil.generateShortUrl();
-        LocalDateTime createdAt = LocalDateTime.now();
+  @BeforeEach
+  public void setUp() {
 
-        List<UrlEntity> urlEntityList = List.of(
-                new UrlEntity(faker.number().randomNumber(),
-                        faker.internet().url(), faker.random().hex(8),
-                        LocalDateTime.now()),
-                new UrlEntity(faker.number().randomNumber(), faker.internet().url(), faker.random().hex(8),
-                        LocalDateTime.now()),
-                new UrlEntity(faker.number().randomNumber(), faker.internet().url(), faker.random().hex(8),
-                        LocalDateTime.now())
-        );
+    long id = faker.number().randomNumber();
+    originalUrl = faker.internet().url();
+    shortUrl = UrlShortenerUtil.generateShortUrl();
+    LocalDateTime createdAt = LocalDateTime.now();
 
-        urlEntityPage = new PageImpl<>(urlEntityList, pageRequest,
-                urlEntityList.size());
+    List<UrlEntity> urlEntityList =
+        List.of(
+            new UrlEntity(
+                faker.number().randomNumber(),
+                faker.internet().url(),
+                faker.random().hex(8),
+                LocalDateTime.now()),
+            new UrlEntity(
+                faker.number().randomNumber(),
+                faker.internet().url(),
+                faker.random().hex(8),
+                LocalDateTime.now()),
+            new UrlEntity(
+                faker.number().randomNumber(),
+                faker.internet().url(),
+                faker.random().hex(8),
+                LocalDateTime.now()));
 
-        urlRequestDTO = new UrlRequestDTO(originalUrl);
+    urlEntityPage =
+        new PageImpl<>(urlEntityList, pageRequest, urlEntityList.size());
 
-        urlEntity = new UrlEntity(
-                id,
-                originalUrl,
-                shortUrl,
-                createdAt
-        );
-    }
+    urlRequestDTO = new UrlRequestDTO(originalUrl);
 
-    @DisplayName("Test Given UrlRequestDTO When Save Should Return " +
-            "UrlResponseDTO")
-    @Test
-    void testGivenUrlRequestDTO_WhenSave_ShouldReturnUrlResponseDTO() {
+    urlEntity = new UrlEntity(id, originalUrl, shortUrl, createdAt);
 
-        // Given / Arrange
-        given(urlFactory.buildUrlEntity())
-                .willReturn(urlEntity);
+    urlAccess = new UrlAccessEntity(urlEntity, LocalDate.now(), 0);
+  }
 
-        given(urlRepository.saveAndFlush(urlEntity))
-                .willReturn(urlEntity);
+  @DisplayName(
+      "Test Given UrlRequestDTO When Save Should Return UrlResponseDTO")
+  @Test
+  void testGivenUrlRequestDTO_WhenSave_ShouldReturnUrlResponseDTO() {
 
-        // When / Act
-        UrlResponseDTO urlResponseDTO = urlService.shortenUrl(urlRequestDTO);
+    // Given / Arrange
+    given(urlFactory.buildUrlEntity()).willReturn(urlEntity);
 
-        // Then / Assert
-        assertNotNull(urlResponseDTO);
-        assertTrue(urlResponseDTO.getId() > 0);
-        assertEquals(urlResponseDTO.getOriginalUrl(), originalUrl);
-        assertEquals(urlResponseDTO.getShortUrl(), urlEntity.getShortUrl());
-        assertNotNull(urlResponseDTO.getCreatedAt());
-    }
+    given(urlRepository.saveAndFlush(urlEntity)).willReturn(urlEntity);
 
-    @DisplayName("Test given pagination pararmeters when list urls should " +
-            "return PaginatedResponseDTO")
-    @Test
-    void testGivenPaginationParameters_WhenListUrls_ShouldReturnPaginatedResponseDTO () {
-        // Given / Arrange
-        given(urlRepository.findAll(pageRequest)).willReturn(urlEntityPage);
+    // When / Act
+    UrlResponseDTO urlResponseDTO = urlService.shortenUrl(urlRequestDTO);
 
-        // When / Act
-        PaginatedResponseDTO<UrlResponseDTO> paginatedResponseDTO =
-                urlService.getUrlsList(pageRequest);
+    // Then / Assert
+    assertNotNull(urlResponseDTO);
+    assertTrue(urlResponseDTO.getId() > 0);
+    assertEquals(urlResponseDTO.getOriginalUrl(), originalUrl);
+    assertEquals(urlResponseDTO.getShortUrl(), urlEntity.getShortUrl());
+    assertNotNull(urlResponseDTO.getCreatedAt());
+  }
 
-        // Then / Assert
-        assertNotNull(paginatedResponseDTO);
+  @DisplayName(
+      "Test given UrlRequestDTO object when update URL Object should"
+          + " update the URL Object and return UrlResponseDTO")
+  @Test
+  void
+      testGivenUrlRequestDTO_WhenUpdateUrlObject_ShouldUpdateTheUrlObjectAndReturnUrlResponseDTO() {
 
-        assertEquals(3, paginatedResponseDTO.getTotalElements());
-        assertEquals(10, urlEntityPage.getSize());
-        assertEquals(3, urlEntityPage.getNumberOfElements());
-        assertEquals(1, urlEntityPage.getTotalPages());
-        assertEquals(0, urlEntityPage.getNumber());
-        assertTrue(urlEntityPage.hasContent());
-    }
+    // Given / Arrange
+    given(urlRepository.findById(anyLong())).willReturn(Optional.of(urlEntity));
 
+    String updatedUrl = faker.internet().url();
+
+    urlRequestDTO = new UrlRequestDTO(updatedUrl);
+
+    given(urlRepository.saveAndFlush(urlEntity)).willReturn(urlEntity);
+
+    // When / Act
+    UrlResponseDTO urlResponseDTO =
+        urlService.updateUrl(urlEntity.getId(), urlRequestDTO);
+
+    // Then / Assert
+    assertNotNull(urlResponseDTO);
+    assertEquals(updatedUrl, urlResponseDTO.getOriginalUrl());
+    assertEquals(urlEntity.getShortUrl(), urlResponseDTO.getShortUrl());
+  }
+
+  @DisplayName(
+      "Test given pagination parameters when list urls should "
+          + "return PaginatedResponseDTO")
+  @Test
+  void
+      testGivenPaginationParameters_WhenListUrls_ShouldReturnPaginatedResponseDTO() {
+    // Given / Arrange
+    given(urlRepository.findAll(pageRequest)).willReturn(urlEntityPage);
+
+    // When / Act
+    PaginatedResponseDTO<UrlResponseDTO> paginatedResponseDTO =
+        urlService.getUrlsList(pageRequest);
+
+    // Then / Assert
+    assertNotNull(paginatedResponseDTO);
+
+    assertEquals(3, paginatedResponseDTO.getTotalElements());
+    assertEquals(10, urlEntityPage.getSize());
+    assertEquals(3, urlEntityPage.getNumberOfElements());
+    assertEquals(1, urlEntityPage.getTotalPages());
+    assertEquals(0, urlEntityPage.getNumber());
+    assertTrue(urlEntityPage.hasContent());
+  }
+
+  @DisplayName("Test given URL id when delete by id then should do nothing")
+  @Test
+  void testGivenUrlId_WhenDeleteById_ThenShouldDoNothing() {
+
+    // Given / Arrange
+    given(urlRepository.findById(anyLong())).willReturn(Optional.of(urlEntity));
+    willDoNothing().given(urlRepository).deleteById(urlEntity.getId());
+
+    // When / Act
+    urlService.deleteUrl(urlEntity.getId());
+
+    // Then / Assert
+    verify(urlRepository, times(1)).findById(urlEntity.getId());
+    verify(urlRepository, times(1)).deleteById(urlEntity.getId());
+  }
+
+  @DisplayName(
+      "Test given Short Url when find by short url then should return"
+          + " UrlResponseDTO object")
+  @Test
+  void
+      testGivenShortUrl_WhenFindByShortUrl_ThenShouldReturnUrlResponseDTOObject() {
+
+    // Given / Arrange
+    given(urlRepository.findByShortUrl(urlEntity.getShortUrl()))
+        .willReturn(Optional.of(urlEntity));
+
+    given(urlAccessRepository.save(urlAccess)).willReturn(urlAccess);
+
+    given(
+            urlAccessRepository.findByUrlAndAccessDate(
+                urlEntity.getId(), LocalDate.now()))
+        .willReturn(Optional.of(urlAccess));
+
+    // When / Act
+    UrlResponseDTO response =
+        urlService.getOriginalUrl(urlEntity.getShortUrl());
+
+    // Then / Assert
+    assertNotNull(response);
+    assertEquals(urlEntity.getId(), response.getId());
+    assertEquals(urlEntity.getOriginalUrl(), response.getOriginalUrl());
+    assertEquals(urlEntity.getShortUrl(), response.getShortUrl());
+    assertEquals(urlEntity.getCreatedAt(), response.getCreatedAt());
+  }
+
+  @DisplayName(
+      "Test given short url when get url stats then should return UrlStatsDTO"
+          + " with current url stats")
+  @Test
+  void
+      testGivenShortUrl_WhenGetUrlStats_ThenShouldReturnUrlStatsDTOWihCurrentUrlStats() {
+
+    // Given / Arrange
+    urlEntity.setAccessLogs(List.of(urlAccess));
+
+    given(urlRepository.findByShortUrl(urlEntity.getShortUrl()))
+        .willReturn(Optional.of(urlEntity));
+
+    // When / Act
+    UrlStatsDTO urlStatsDTO = urlService.getUrlStats(urlEntity.getShortUrl());
+
+    // Then / Assert
+    assertNotNull(urlStatsDTO);
+    assertEquals(1, urlStatsDTO.getAccessLogs().size());
+    assertEquals(urlEntity.getOriginalUrl(), urlStatsDTO.getOriginalUrl());
+    assertEquals(urlEntity.getShortUrl(), urlStatsDTO.getShortenedUrl());
+  }
 }
