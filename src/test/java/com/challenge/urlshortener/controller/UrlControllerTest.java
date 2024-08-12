@@ -1,7 +1,6 @@
 package com.challenge.urlshortener.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -183,11 +182,12 @@ public class UrlControllerTest {
           throws Exception {
 
     // Given / Arrange
-    given(urlService.getOriginalUrl(anyString())).willReturn(urlResponseDTO);
+    given(urlService.getOriginalUrl(shortUrl)).willReturn(urlResponseDTO);
 
     // When / Act
     ResultActions resultActions =
-        mockMvc.perform(get("/api/v1/urls/" + urlResponseDTO.getShortUrl()));
+        mockMvc.perform(
+            get("/api/v1/urls/{shortUrl}", urlResponseDTO.getShortUrl()));
 
     String redirectUrl =
         resultActions.andReturn().getResponse().getRedirectedUrl();
