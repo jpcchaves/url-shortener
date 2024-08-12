@@ -1,10 +1,10 @@
 package com.challenge.urlshortener.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
@@ -220,6 +220,35 @@ public class UrlControllerTest {
     // Then / Assert
     assertNotNull(response);
     assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+  }
+
+  @DisplayName(
+      "Test given updated url when update then return url response DTO")
+  @Test
+  void testGivenUpdatedUrl_whenUpdate_thenReturnUrlResponseDTO()
+      throws Exception {
+
+    // Given / Arrange
+    given(urlService.updateUrl(anyLong(), any(UrlRequestDTO.class)))
+        .willReturn(urlResponseDTO);
+
+    // When / Act
+    MockHttpServletResponse response =
+        mockMvc
+            .perform(
+                put("/api/v1/urls/{urlId}", id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(urlRequestDTO)))
+            .andReturn()
+            .getResponse();
+
+    UrlResponseDTO responseDTO =
+        mapper.readValue(response.getContentAsString(), UrlResponseDTO.class);
+
+    // Then / Assert
+    assertNotNull(responseDTO);
+    assertEquals(response.getStatus(), HttpStatus.OK.value());
+    assertEquals(urlRequestDTO.getOriginalUrl(), responseDTO.getOriginalUrl());
   }
 
   @DisplayName(
