@@ -4,16 +4,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.challenge.urlshortener.domain.entity.UrlAccessEntity;
 import com.challenge.urlshortener.domain.entity.UrlEntity;
+import com.challenge.urlshortener.integrationtests.testcontainers.AbstractIntegrationTest;
 import com.challenge.urlshortener.util.UrlShortenerUtil;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
-class UrlAccessRepositoryTest {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class UrlAccessRepositoryTest extends AbstractIntegrationTest {
 
   @Autowired private UrlRepository urlRepository;
   @Autowired private UrlAccessRepository urlAccessRepository;
