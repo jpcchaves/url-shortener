@@ -1,6 +1,7 @@
 package com.challenge.urlshortener.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -171,6 +172,29 @@ public class UrlControllerTest {
             .andExpect(jsonPath("$.createdAt", notNullValue()));
 
     */
+  }
+
+  @DisplayName(
+      "Test given Short URL when redirect to original url then should redirect"
+          + " to the original url")
+  @Test
+  void
+      testGivenShortUrl_WhenRedirectToOriginalUrl_ThenShouldRedirectToTheOriginalUrl()
+          throws Exception {
+
+    // Given / Arrange
+    given(urlService.getOriginalUrl(anyString())).willReturn(urlResponseDTO);
+
+    // When / Act
+    ResultActions resultActions =
+        mockMvc.perform(get("/api/v1/urls/" + urlResponseDTO.getShortUrl()));
+
+    String redirectUrl =
+        resultActions.andReturn().getResponse().getRedirectedUrl();
+
+    // Then / Assert
+    assertNotNull(redirectUrl);
+    assertEquals(urlResponseDTO.getOriginalUrl(), redirectUrl);
   }
 
   @DisplayName(
