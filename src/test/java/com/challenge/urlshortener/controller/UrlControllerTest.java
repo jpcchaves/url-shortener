@@ -10,6 +10,7 @@ import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
 import com.challenge.urlshortener.domain.entity.UrlEntity;
+import com.challenge.urlshortener.exception.ResourceNotFoundException;
 import com.challenge.urlshortener.service.UrlService;
 import com.challenge.urlshortener.util.UrlShortenerUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +26,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -195,6 +197,29 @@ public class UrlControllerTest {
     // Then / Assert
     assertNotNull(redirectUrl);
     assertEquals(urlResponseDTO.getOriginalUrl(), redirectUrl);
+  }
+
+  @DisplayName(
+      "Test given Invalid Short URL when redirect to original url then should"
+          + " redirect to the original url")
+  @Test
+  void testGivenInvalidShortUrl_WhenRedirectToOriginalUrl_ThenReturnNotFound()
+      throws Exception {
+
+    // Given / Arrange
+    given(urlService.getOriginalUrl(shortUrl))
+        .willThrow(ResourceNotFoundException.class);
+
+    // When / Act
+    ResultActions resultActions =
+        mockMvc.perform(
+            get("/api/v1/urls/{shortUrl}", urlResponseDTO.getShortUrl()));
+
+    MockHttpServletResponse response = resultActions.andReturn().getResponse();
+
+    // Then / Assert
+    assertNotNull(response);
+    assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
   }
 
   @DisplayName(
