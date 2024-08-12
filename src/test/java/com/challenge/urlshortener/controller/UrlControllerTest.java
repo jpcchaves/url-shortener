@@ -251,6 +251,32 @@ public class UrlControllerTest {
     assertEquals(urlRequestDTO.getOriginalUrl(), responseDTO.getOriginalUrl());
   }
 
+  @DisplayName("Test given invalid url ID when update then return exception")
+  @Test
+  void testGivenInvalidUrlId_whenUpdate_thenReturnException() throws Exception {
+
+    // Given / Arrange
+    given(urlService.updateUrl(anyLong(), any(UrlRequestDTO.class)))
+        .willThrow(ResourceNotFoundException.class);
+
+    // When / Act
+    MockHttpServletResponse response =
+        mockMvc
+            .perform(
+                put("/api/v1/urls/{urlId}", id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(urlRequestDTO)))
+            .andReturn()
+            .getResponse();
+
+    UrlResponseDTO responseDTO =
+        mapper.readValue(response.getContentAsString(), UrlResponseDTO.class);
+
+    // Then / Assert
+    assertNotNull(responseDTO);
+    assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+  }
+
   @DisplayName(
       "Test given pagination parameters when list urls then should return URL"
           + " list paginated")
