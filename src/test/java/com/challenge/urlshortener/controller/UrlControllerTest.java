@@ -2,8 +2,7 @@ package com.challenge.urlshortener.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.any;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
@@ -305,5 +304,25 @@ public class UrlControllerTest {
     assertEquals(
         urlEntityPaginatedResponseDTO.getContent().size(),
         urlEntityList.size());
+  }
+
+  @DisplayName(
+      "Test given url ID when delete url then should return no content")
+  @Test
+  void testGivenUrlId_WhenDeleteUrl_ThenShouldReturnNoContent()
+      throws Exception {
+
+    // Given / Arrange
+    willDoNothing().given(urlService).deleteUrl(id);
+
+    // When / Act
+    MockHttpServletResponse response =
+        mockMvc
+            .perform(delete("/api/v1/urls/{urlId}", id))
+            .andReturn()
+            .getResponse();
+
+    // Then / Assert
+    assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
   }
 }
