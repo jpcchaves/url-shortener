@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.net.URI;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -25,9 +25,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.net.URI;
 
 @Tag(name = "Url Controller")
 @RestController
@@ -43,53 +40,48 @@ public class UrlController {
   @Operation(
       summary = "Creates a shortened URL",
       description =
-          "Creates a shortened URL by passing the original URL in the request" +
-              " body",
+          "Creates a shortened URL by passing the original URL in the request"
+              + " body",
       responses = {
-          @ApiResponse(
-              description = "Created",
-              responseCode = "201",
-              content =
-              @Content(
-                  schema =
-                  @Schema(implementation = UrlResponseDTO.class))),
-          @ApiResponse(
-              description = "Bad Request",
-              responseCode = "400",
-              content = @Content)
+        @ApiResponse(
+            description = "Created",
+            responseCode = "201",
+            content =
+                @Content(
+                    schema = @Schema(implementation = UrlResponseDTO.class))),
+        @ApiResponse(
+            description = "Bad Request",
+            responseCode = "400",
+            content = @Content)
       })
   @PostMapping
   public ResponseEntity<UrlResponseDTO> createShortUrl(
-      @RequestBody @Valid
-      UrlRequestDTO requestDTO
-  ) {
+      @RequestBody @Valid UrlRequestDTO requestDTO) {
     return ResponseEntity.status(HttpStatus.CREATED)
-                         .body(urlService.shortenUrl(requestDTO));
+        .body(urlService.shortenUrl(requestDTO));
   }
 
   @Operation(
       summary = "Updates a URL",
       description =
-          "Updates a URL URL by passing the urlId and the originalUrl in JSON" +
-              " request body",
+          "Updates a URL URL by passing the urlId and the originalUrl in JSON"
+              + " request body",
       responses = {
-          @ApiResponse(
-              description = "Updated",
-              responseCode = "200",
-              content =
-              @Content(
-                  schema =
-                  @Schema(implementation = UrlResponseDTO.class))),
-          @ApiResponse(
-              description = "Bad Request",
-              responseCode = "400",
-              content = @Content)
+        @ApiResponse(
+            description = "Updated",
+            responseCode = "200",
+            content =
+                @Content(
+                    schema = @Schema(implementation = UrlResponseDTO.class))),
+        @ApiResponse(
+            description = "Bad Request",
+            responseCode = "400",
+            content = @Content)
       })
   @PutMapping("/{urlId}")
   public ResponseEntity<UrlResponseDTO> updateShortUrl(
       @PathVariable(name = "urlId") Long urlId,
-      @RequestBody UrlRequestDTO requestDTO
-  ) {
+      @RequestBody UrlRequestDTO requestDTO) {
     return ResponseEntity.ok(urlService.updateUrl(urlId, requestDTO));
   }
 
@@ -97,17 +89,18 @@ public class UrlController {
       summary = "Deletes a URL",
       description = "Deletes a URL by passing the urlId as a path variable.",
       responses = {
-          @ApiResponse(
-              description = "No Content",
-              responseCode = "204",
-              content = @Content),
-          @ApiResponse(
-              description = "Not Found",
-              responseCode = "404",
-              content = @Content)
+        @ApiResponse(
+            description = "No Content",
+            responseCode = "204",
+            content = @Content),
+        @ApiResponse(
+            description = "Not Found",
+            responseCode = "404",
+            content = @Content)
       })
   @DeleteMapping("/{urlId}")
-  public ResponseEntity<Void> deleteUrl(@PathVariable(name = "urlId") Long urlId) {
+  public ResponseEntity<Void> deleteUrl(
+      @PathVariable(name = "urlId") Long urlId) {
 
     urlService.deleteUrl(urlId);
 
@@ -117,71 +110,63 @@ public class UrlController {
   @Operation(
       summary = "Redirect to the original URL",
       responses = {
-          @ApiResponse(responseCode = "302", description = "Redirect to the " +
-              "original URL"),
-          @ApiResponse(responseCode = "404", description = "URL not found")
+        @ApiResponse(
+            responseCode = "302",
+            description = "Redirect to the " + "original URL"),
+        @ApiResponse(responseCode = "404", description = "URL not found")
       })
   @GetMapping("/{shortUrl}")
   public ResponseEntity<Void> redirectUrl(
-      @PathVariable(name = "shortUrl") String shortUrl,
-      HttpServletResponse response
-  ) throws IOException {
+      @PathVariable(name = "shortUrl") String shortUrl) {
 
     UrlResponseDTO responseDTO = urlService.getOriginalUrl(shortUrl);
 
     return ResponseEntity.status(HttpStatus.FOUND)
-                         .location(URI.create(responseDTO.getOriginalUrl()))
-                         .build();
+        .location(URI.create(responseDTO.getOriginalUrl()))
+        .build();
   }
 
   @Operation(
       summary = "Get URL stats",
       description =
-          "Get the stats about an URL, like its number of accesses and " +
-              "average access per day since it was created",
+          "Get the stats about an URL, like its number of accesses and "
+              + "average access per day since it was created",
       responses = {
-          @ApiResponse(
-              description = "Success",
-              responseCode = "200",
-              content =
-              @Content(
-                  schema =
-                  @Schema(implementation = UrlStatsDTO.class))),
-          @ApiResponse(
-              description = "Bad Request",
-              responseCode = "400",
-              content = @Content)
+        @ApiResponse(
+            description = "Success",
+            responseCode = "200",
+            content =
+                @Content(schema = @Schema(implementation = UrlStatsDTO.class))),
+        @ApiResponse(
+            description = "Bad Request",
+            responseCode = "400",
+            content = @Content)
       })
   @GetMapping("/{shortUrl}/stats")
   public ResponseEntity<UrlStatsDTO> getUrlStats(
-      @PathVariable(name =
-          "shortUrl") String shortUrl
-  ) {
+      @PathVariable(name = "shortUrl") String shortUrl) {
 
     return ResponseEntity.ok(urlService.getUrlStats(shortUrl));
   }
 
-
   @Operation(
       summary = "Get URL list paginated",
-      description =
-          "Get a list of all the URL created with pagination feature",
+      description = "Get a list of all the URL created with pagination feature",
       responses = {
-          @ApiResponse(
-              description = "Success",
-              responseCode = "200",
-              content =
-              @Content(
-                  schema =
-                  @Schema(implementation = UrlStatsDTO.class))),
-          @ApiResponse(
-              description = "Bad Request",
-              responseCode = "400",
-              content = @Content)
+        @ApiResponse(
+            description = "Success",
+            responseCode = "200",
+            content =
+                @Content(schema = @Schema(implementation = UrlStatsDTO.class))),
+        @ApiResponse(
+            description = "Bad Request",
+            responseCode = "400",
+            content = @Content)
       })
   @PageableAsQueryParam
   @GetMapping
-  public ResponseEntity<PaginatedResponseDTO<UrlResponseDTO>> getUrlList(@Parameter(hidden = true) Pageable pageable) {
+  public ResponseEntity<PaginatedResponseDTO<UrlResponseDTO>> getUrlList(
+      @Parameter(hidden = true) Pageable pageable) {
 
     return ResponseEntity.ok(urlService.getUrlsList(pageable));
   }

@@ -12,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -22,40 +21,33 @@ import java.time.LocalDate;
 @SequenceGenerator(
     name = "seq_url_access",
     sequenceName = "seq_url_access",
-    allocationSize = 1
-)
+    allocationSize = 1)
 public class UrlAccessEntity implements Serializable {
 
-  @Serial
-  private static final long serialVersionUID = 7706100049740930617L;
+  @Serial private static final long serialVersionUID = 7706100049740930617L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-      "seq_url_access")
+  @GeneratedValue(
+      strategy = GenerationType.SEQUENCE,
+      generator = "seq_url_access")
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(
       name = "url_id",
       nullable = false,
-      foreignKey = @ForeignKey(
-          name = "url_fk",
-          value = ConstraintMode.CONSTRAINT
-      ))
+      foreignKey =
+          @ForeignKey(name = "url_fk", value = ConstraintMode.CONSTRAINT))
   @JsonIgnore
   private UrlEntity url;
+
   private LocalDate accessDate;
   private Integer accessCount = 0;
 
-  public UrlAccessEntity() {
-  }
+  public UrlAccessEntity() {}
 
   public UrlAccessEntity(
-      Long id,
-      UrlEntity url,
-      LocalDate accessDate,
-      Integer accessCount
-  ) {
+      Long id, UrlEntity url, LocalDate accessDate, Integer accessCount) {
     this.id = id;
     this.url = url;
     this.accessDate = accessDate;
@@ -63,15 +55,11 @@ public class UrlAccessEntity implements Serializable {
   }
 
   public UrlAccessEntity(
-      UrlEntity url,
-      LocalDate accessDate,
-      Integer accessCount
-  ) {
+      UrlEntity url, LocalDate accessDate, Integer accessCount) {
     this.url = url;
     this.accessDate = accessDate;
     this.accessCount = accessCount;
   }
-
 
   public Long getId() {
     return id;

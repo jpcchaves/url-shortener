@@ -1,14 +1,15 @@
 package com.challenge.urlshortener.util;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class UrlShortenerUtilTest {
 
-  @DisplayName("Test given short url when generate method is called should " +
-      "return short url")
+  @DisplayName(
+      "Test given short url when generate method is called should "
+          + "return short url")
   @Test
   void testGivenShortUrlWhenGenerateMethodIsCalledShouldReturnShortUrl() {
 

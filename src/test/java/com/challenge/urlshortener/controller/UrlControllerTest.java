@@ -1,16 +1,15 @@
 package com.challenge.urlshortener.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
 import com.challenge.urlshortener.domain.entity.UrlEntity;
+import com.challenge.urlshortener.exception.ResourceNotFoundException;
 import com.challenge.urlshortener.service.UrlService;
 import com.challenge.urlshortener.util.UrlShortenerUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -183,11 +183,12 @@ public class UrlControllerTest {
           throws Exception {
 
     // Given / Arrange
-    given(urlService.getOriginalUrl(anyString())).willReturn(urlResponseDTO);
+    given(urlService.getOriginalUrl(shortUrl)).willReturn(urlResponseDTO);
 
     // When / Act
     ResultActions resultActions =
-        mockMvc.perform(get("/api/v1/urls/" + urlResponseDTO.getShortUrl()));
+        mockMvc.perform(
+            get("/api/v1/urls/{shortUrl}", urlResponseDTO.getShortUrl()));
 
     String redirectUrl =
         resultActions.andReturn().getResponse().getRedirectedUrl();
@@ -195,6 +196,84 @@ public class UrlControllerTest {
     // Then / Assert
     assertNotNull(redirectUrl);
     assertEquals(urlResponseDTO.getOriginalUrl(), redirectUrl);
+  }
+
+  @DisplayName(
+      "Test given Invalid Short URL when redirect to original url then should"
+          + " redirect to the original url")
+  @Test
+  void testGivenInvalidShortUrl_WhenRedirectToOriginalUrl_ThenReturnNotFound()
+      throws Exception {
+
+    // Given / Arrange
+    given(urlService.getOriginalUrl(shortUrl))
+        .willThrow(ResourceNotFoundException.class);
+
+    // When / Act
+    ResultActions resultActions =
+        mockMvc.perform(
+            get("/api/v1/urls/{shortUrl}", urlResponseDTO.getShortUrl()));
+
+    MockHttpServletResponse response = resultActions.andReturn().getResponse();
+
+    // Then / Assert
+    assertNotNull(response);
+    assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+  }
+
+  @DisplayName(
+      "Test given updated url when update then return url response DTO")
+  @Test
+  void testGivenUpdatedUrl_whenUpdate_thenReturnUrlResponseDTO()
+      throws Exception {
+
+    // Given / Arrange
+    given(urlService.updateUrl(anyLong(), any(UrlRequestDTO.class)))
+        .willReturn(urlResponseDTO);
+
+    // When / Act
+    MockHttpServletResponse response =
+        mockMvc
+            .perform(
+                put("/api/v1/urls/{urlId}", id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(urlRequestDTO)))
+            .andReturn()
+            .getResponse();
+
+    UrlResponseDTO responseDTO =
+        mapper.readValue(response.getContentAsString(), UrlResponseDTO.class);
+
+    // Then / Assert
+    assertNotNull(responseDTO);
+    assertEquals(response.getStatus(), HttpStatus.OK.value());
+    assertEquals(urlRequestDTO.getOriginalUrl(), responseDTO.getOriginalUrl());
+  }
+
+  @DisplayName("Test given invalid url ID when update then return exception")
+  @Test
+  void testGivenInvalidUrlId_whenUpdate_thenReturnException() throws Exception {
+
+    // Given / Arrange
+    given(urlService.updateUrl(anyLong(), any(UrlRequestDTO.class)))
+        .willThrow(ResourceNotFoundException.class);
+
+    // When / Act
+    MockHttpServletResponse response =
+        mockMvc
+            .perform(
+                put("/api/v1/urls/{urlId}", id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(urlRequestDTO)))
+            .andReturn()
+            .getResponse();
+
+    UrlResponseDTO responseDTO =
+        mapper.readValue(response.getContentAsString(), UrlResponseDTO.class);
+
+    // Then / Assert
+    assertNotNull(responseDTO);
+    assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
   }
 
   @DisplayName(
@@ -225,5 +304,25 @@ public class UrlControllerTest {
     assertEquals(
         urlEntityPaginatedResponseDTO.getContent().size(),
         urlEntityList.size());
+  }
+
+  @DisplayName(
+      "Test given url ID when delete url then should return no content")
+  @Test
+  void testGivenUrlId_WhenDeleteUrl_ThenShouldReturnNoContent()
+      throws Exception {
+
+    // Given / Arrange
+    willDoNothing().given(urlService).deleteUrl(id);
+
+    // When / Act
+    MockHttpServletResponse response =
+        mockMvc
+            .perform(delete("/api/v1/urls/{urlId}", id))
+            .andReturn()
+            .getResponse();
+
+    // Then / Assert
+    assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
   }
 }

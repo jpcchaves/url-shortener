@@ -5,11 +5,7 @@ public abstract class BaseException extends RuntimeException {
   private final String code;
   private final int httpStatus;
 
-  public BaseException(
-      String message,
-      String code,
-      int httpStatus
-  ) {
+  public BaseException(String message, String code, int httpStatus) {
     super(message);
     this.code = code;
     this.httpStatus = httpStatus;
@@ -20,7 +16,6 @@ public abstract class BaseException extends RuntimeException {
     this.code = exceptionDefinition.getCode();
     this.httpStatus = exceptionDefinition.getHttpStatus();
   }
-
 
   public String getCode() {
     return code;

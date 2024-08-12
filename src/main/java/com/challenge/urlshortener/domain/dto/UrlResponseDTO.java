@@ -6,8 +6,7 @@ import java.time.LocalDateTime;
 
 public class UrlResponseDTO implements Serializable {
 
-  @Serial
-  private static final long serialVersionUID = 3456859418009760272L;
+  @Serial private static final long serialVersionUID = 3456859418009760272L;
 
   private Long id;
 
@@ -17,15 +16,10 @@ public class UrlResponseDTO implements Serializable {
 
   private LocalDateTime createdAt;
 
-  public UrlResponseDTO() {
-  }
+  public UrlResponseDTO() {}
 
   public UrlResponseDTO(
-      Long id,
-      String originalUrl,
-      String shortUrl,
-      LocalDateTime createdAt
-  ) {
+      Long id, String originalUrl, String shortUrl, LocalDateTime createdAt) {
     this.id = id;
     this.originalUrl = originalUrl;
     this.shortUrl = shortUrl;
@@ -55,7 +49,6 @@ public class UrlResponseDTO implements Serializable {
   public void setShortUrl(String shortUrl) {
     this.shortUrl = shortUrl;
   }
-  
 
   public LocalDateTime getCreatedAt() {
     return createdAt;
