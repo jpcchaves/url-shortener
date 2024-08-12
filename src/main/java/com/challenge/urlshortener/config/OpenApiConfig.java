@@ -21,13 +21,11 @@ public class OpenApiConfig {
                     new Contact()
                         .url("https://www.linkedin.com/in/joaopaulo-chaves/")
                         .email("jpcchaves@outlook.com"))
-                .description(
-                    "REST API built to create shortened URLS")
+                .description("REST API built to create shortened URLS")
                 .termsOfService("https://jpcchaves-dev.netlify.app")
                 .license(
                     new License()
                         .name("MIT")
                         .url("https://jpcchaves-dev.netlify.app")));
   }
-
 }

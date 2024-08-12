@@ -1,7 +1,6 @@
 package com.challenge.urlshortener.domain.dto;
 
 import com.challenge.urlshortener.domain.entity.UrlAccessEntity;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,14 +9,12 @@ public class UrlStatsDTO {
   private String shortenedUrl;
   private List<UrlAccessEntity> accessLogs = new ArrayList<>();
 
-  public UrlStatsDTO() {
-  }
+  public UrlStatsDTO() {}
 
   public UrlStatsDTO(
       String originalUrl,
       String shortenedUrl,
-      List<UrlAccessEntity> accessLogs
-  ) {
+      List<UrlAccessEntity> accessLogs) {
     this.originalUrl = originalUrl;
     this.shortenedUrl = shortenedUrl;
     this.accessLogs = accessLogs;

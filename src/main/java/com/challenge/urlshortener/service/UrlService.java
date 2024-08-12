@@ -10,10 +10,7 @@ public interface UrlService {
 
   UrlResponseDTO shortenUrl(UrlRequestDTO requestDTO);
 
-  UrlResponseDTO updateUrl(
-      Long urlId,
-      UrlRequestDTO requestDTO
-  );
+  UrlResponseDTO updateUrl(Long urlId, UrlRequestDTO requestDTO);
 
   void deleteUrl(Long urlId);
 
@@ -22,5 +19,4 @@ public interface UrlService {
   UrlStatsDTO getUrlStats(String shortUrl);
 
   PaginatedResponseDTO<UrlResponseDTO> getUrlsList(Pageable pageable);
-
 }

@@ -8,8 +8,7 @@ public class UrlRequestDTO {
   @NotBlank(message = "The URL must not be null or blank!")
   private String originalUrl;
 
-  public UrlRequestDTO() {
-  }
+  public UrlRequestDTO() {}
 
   public UrlRequestDTO(String originalUrl) {
     this.originalUrl = originalUrl;

@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PaginatedResponseDTO<T> implements Serializable {
-  @Serial
-  private static final long serialVersionUID = 4917598859451870178L;
+  @Serial private static final long serialVersionUID = 4917598859451870178L;
 
   private List<T> content = new ArrayList<>();
   private int page;
@@ -16,8 +15,7 @@ public class PaginatedResponseDTO<T> implements Serializable {
   private int totalPages;
   private boolean last;
 
-  public PaginatedResponseDTO() {
-  }
+  public PaginatedResponseDTO() {}
 
   public PaginatedResponseDTO(
       List<T> content,
@@ -25,8 +23,7 @@ public class PaginatedResponseDTO<T> implements Serializable {
       int size,
       long totalElements,
       int totalPages,
-      boolean last
-  ) {
+      boolean last) {
     this.content = content;
     this.page = page;
     this.size = size;
@@ -104,8 +101,7 @@ public class PaginatedResponseDTO<T> implements Serializable {
     private int totalPages;
     private boolean last;
 
-    public Builder() {
-    }
+    public Builder() {}
 
     public Builder<T> setContent(List<T> content) {
       this.content = content;

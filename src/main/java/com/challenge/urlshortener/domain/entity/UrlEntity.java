@@ -11,30 +11,32 @@ import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import org.hibernate.annotations.CreationTimestamp;
 
-
-@Table(name = "urls", indexes = {
-    @Index(name = "short_url_idx", columnList = "short_url"),
-    @Index(name = "created_at_idx", columnList = "created_at")
-})
+@Table(
+    name = "urls",
+    indexes = {
+      @Index(name = "short_url_idx", columnList = "short_url"),
+      @Index(name = "created_at_idx", columnList = "created_at")
+    })
 @Entity
-@SequenceGenerator(name = "seq_url_entity", sequenceName = "seq_url_entity",
+@SequenceGenerator(
+    name = "seq_url_entity",
+    sequenceName = "seq_url_entity",
     allocationSize = 1)
 public class UrlEntity implements Serializable {
 
-  @Serial
-  private static final long serialVersionUID = -5595771988486172814L;
+  @Serial private static final long serialVersionUID = -5595771988486172814L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-      "seq_url_entity")
+  @GeneratedValue(
+      strategy = GenerationType.SEQUENCE,
+      generator = "seq_url_entity")
   private Long id;
 
   @Column(nullable = false)
@@ -47,24 +49,21 @@ public class UrlEntity implements Serializable {
       mappedBy = "url",
       cascade = CascadeType.ALL,
       fetch = FetchType.LAZY,
-      orphanRemoval = true
-  )
+      orphanRemoval = true)
   private List<UrlAccessEntity> accessLogs;
 
   @CreationTimestamp
   @Column(updatable = false)
   private LocalDateTime createdAt;
 
-  public UrlEntity() {
-  }
+  public UrlEntity() {}
 
   public UrlEntity(
       Long id,
       String originalUrl,
       String shortUrl,
       List<UrlAccessEntity> accessLogs,
-      LocalDateTime createdAt
-  ) {
+      LocalDateTime createdAt) {
     this.id = id;
     this.originalUrl = originalUrl;
     this.shortUrl = shortUrl;
@@ -76,23 +75,20 @@ public class UrlEntity implements Serializable {
       String originalUrl,
       String shortUrl,
       List<UrlAccessEntity> accessLogs,
-      LocalDateTime createdAt
-  ) {
+      LocalDateTime createdAt) {
     this.originalUrl = originalUrl;
     this.shortUrl = shortUrl;
     this.accessLogs = accessLogs;
     this.createdAt = createdAt;
   }
 
-  public UrlEntity(
-      String originalUrl,
-      String shortUrl
-  ) {
+  public UrlEntity(String originalUrl, String shortUrl) {
     this.originalUrl = originalUrl;
     this.shortUrl = shortUrl;
   }
 
-  public UrlEntity(Long id, String originalUrl, String shortUrl, LocalDateTime createdAt) {
+  public UrlEntity(
+      Long id, String originalUrl, String shortUrl, LocalDateTime createdAt) {
     this.id = id;
     this.originalUrl = originalUrl;
     this.shortUrl = shortUrl;
@@ -154,11 +150,17 @@ public class UrlEntity implements Serializable {
 
   @Override
   public String toString() {
-    return "UrlEntity{" +
-        "id=" + id +
-        ", originalUrl='" + originalUrl + '\'' +
-        ", shortUrl='" + shortUrl + '\'' +
-        ", createdAt=" + createdAt +
-        '}';
+    return "UrlEntity{"
+        + "id="
+        + id
+        + ", originalUrl='"
+        + originalUrl
+        + '\''
+        + ", shortUrl='"
+        + shortUrl
+        + '\''
+        + ", createdAt="
+        + createdAt
+        + '}';
   }
 }

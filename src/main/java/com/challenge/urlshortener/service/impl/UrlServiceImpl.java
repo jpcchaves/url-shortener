@@ -14,14 +14,13 @@ import com.challenge.urlshortener.repository.UrlRepository;
 import com.challenge.urlshortener.service.UrlService;
 import com.challenge.urlshortener.util.UrlShortenerMapper;
 import com.challenge.urlshortener.util.UrlShortenerUtil;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UrlServiceImpl implements UrlService {
@@ -33,8 +32,7 @@ public class UrlServiceImpl implements UrlService {
   public UrlServiceImpl(
       UrlRepository urlRepository,
       UrlAccessRepository urlAccessRepository,
-      UrlFactory urlFactory
-  ) {
+      UrlFactory urlFactory) {
     this.urlRepository = urlRepository;
     this.urlAccessRepository = urlAccessRepository;
     this.urlFactory = urlFactory;
@@ -58,15 +56,14 @@ public class UrlServiceImpl implements UrlService {
 
   @Override
   @Transactional
-  public UrlResponseDTO updateUrl(
-      Long urlId,
-      UrlRequestDTO requestDTO
-  ) {
+  public UrlResponseDTO updateUrl(Long urlId, UrlRequestDTO requestDTO) {
 
-    UrlEntity urlEntity = urlRepository
-        .findById(urlId)
-        .orElseThrow(
-            () -> new ResourceNotFoundException(ExceptionDefinition.URL0002));
+    UrlEntity urlEntity =
+        urlRepository
+            .findById(urlId)
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(ExceptionDefinition.URL0002));
 
     urlEntity.setOriginalUrl(requestDTO.getOriginalUrl());
 
@@ -78,10 +75,12 @@ public class UrlServiceImpl implements UrlService {
   @Override
   public void deleteUrl(Long urlId) {
 
-    UrlEntity urlEntity = urlRepository
-        .findById(urlId)
-        .orElseThrow(
-            () -> new ResourceNotFoundException(ExceptionDefinition.URL0002));
+    UrlEntity urlEntity =
+        urlRepository
+            .findById(urlId)
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(ExceptionDefinition.URL0002));
 
     urlRepository.deleteById(urlEntity.getId());
   }
@@ -90,10 +89,12 @@ public class UrlServiceImpl implements UrlService {
   @Transactional
   public UrlResponseDTO getOriginalUrl(String shortUrl) {
 
-    UrlEntity url = urlRepository
-        .findByShortUrl(shortUrl)
-        .orElseThrow(
-            () -> new ResourceNotFoundException(ExceptionDefinition.URL0001));
+    UrlEntity url =
+        urlRepository
+            .findByShortUrl(shortUrl)
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(ExceptionDefinition.URL0001));
 
     recordAccess(url);
 
@@ -102,15 +103,15 @@ public class UrlServiceImpl implements UrlService {
 
   @Override
   public UrlStatsDTO getUrlStats(String shortUrl) {
-    UrlEntity url = urlRepository.findByShortUrl(shortUrl)
-                                 .orElseThrow(
-                                     () -> new ResourceNotFoundException(ExceptionDefinition.URL0001));
+    UrlEntity url =
+        urlRepository
+            .findByShortUrl(shortUrl)
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(ExceptionDefinition.URL0001));
 
     return new UrlStatsDTO(
-        url.getOriginalUrl(),
-        url.getShortUrl(),
-        url.getAccessLogs()
-    );
+        url.getOriginalUrl(), url.getShortUrl(), url.getAccessLogs());
   }
 
   @Override
