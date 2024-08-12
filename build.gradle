@@ -24,11 +24,13 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
     implementation 'net.datafaker:datafaker:2.3.1'
 
+
     runtimeOnly 'org.postgresql:postgresql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation group: 'com.h2database', name: 'h2', version: '2.3.230'
-
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.0'
+    
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
