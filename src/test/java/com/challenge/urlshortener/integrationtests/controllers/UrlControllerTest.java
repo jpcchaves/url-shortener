@@ -14,6 +14,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.response.Response;
 import io.restassured.response.ResponseOptions;
 import io.restassured.specification.RequestSpecification;
 import java.io.IOException;
@@ -213,5 +214,23 @@ class UrlControllerTest extends AbstractIntegrationTest {
     assertNotNull(paginatedResponseDTO.getContent());
 
     assertEquals(1, paginatedResponseDTO.getContent().size());
+  }
+
+  @DisplayName(
+      "Integration test given urlId when delete by id then should return no"
+          + " content")
+  @Test
+  @Order(6)
+  void integrationTestGivenUrlId_WhenDeleteById_ThenShouldReturnNoContent() {
+
+    // Given / Arrange
+
+    Response response =
+        given()
+            .spec(requestSpecification)
+            .delete("/{urlId}", urlResponseDTO.getId());
+
+    // When / Act / Then / Assert
+    assertEquals(response.statusCode(), HttpStatus.NO_CONTENT.value());
   }
 }
