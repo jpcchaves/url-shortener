@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.challenge.urlshortener.config.SingletonObjectMapperConfig;
 import com.challenge.urlshortener.config.TestConfigs;
+import com.challenge.urlshortener.domain.dto.PaginatedResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
 import com.challenge.urlshortener.domain.dto.UrlStatsDTO;
@@ -20,6 +21,7 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -173,5 +175,43 @@ class UrlControllerTest extends AbstractIntegrationTest {
     assertNotNull(statsDTO.getAccessLogs());
 
     assertEquals(1, statsDTO.getAccessLogs().size());
+  }
+
+  @DisplayName(
+      "Integration test given pagination parameters when list all then should"
+          + " return url list paginated")
+  @Test
+  @Order(5)
+  void
+      integrationTestGivenPaginationParameters_WhenListAll_ThenShouldReturnUrlListPaginated()
+          throws IOException {
+
+    // Given / Arrange
+    ResponseOptions<?> response =
+        given()
+            .spec(requestSpecification)
+            .param("size", "10")
+            .param("sort", "createdAt,asc")
+            .when()
+            .get()
+            .andReturn();
+
+    // When / Act
+    PaginatedResponseDTO<UrlResponseDTO> paginatedResponseDTO =
+        mapper.readValue(
+            response.body().asString(),
+            new TypeReference<PaginatedResponseDTO<UrlResponseDTO>>() {});
+
+    // Then / Assert
+    assertNotNull(paginatedResponseDTO);
+
+    assertTrue(paginatedResponseDTO.getPage() >= 0);
+    assertTrue(paginatedResponseDTO.getSize() >= 0);
+    assertTrue(paginatedResponseDTO.getTotalElements() >= 0);
+    assertTrue(paginatedResponseDTO.getTotalPages() >= 0);
+
+    assertNotNull(paginatedResponseDTO.getContent());
+
+    assertEquals(1, paginatedResponseDTO.getContent().size());
   }
 }
