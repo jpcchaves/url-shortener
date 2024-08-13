@@ -12,6 +12,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.response.ResponseOptions;
 import io.restassured.specification.RequestSpecification;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -107,7 +108,7 @@ class UrlControllerTest extends AbstractIntegrationTest {
   void
       integrationTestGivenUrlRequestDTO_WhenUpdateURL_ThenShouldReturnUpdatedUrlResponseDTO()
           throws IOException {
-    System.out.println(urlResponseDTO);
+
     urlRequestDTO = new UrlRequestDTO(faker.internet().url());
 
     String requestBody =
@@ -136,5 +137,25 @@ class UrlControllerTest extends AbstractIntegrationTest {
 
     assertEquals(
         urlRequestDTO.getOriginalUrl(), urlResponseDTO.getOriginalUrl());
+  }
+
+  @DisplayName(
+      "Integration test given shortUrl when find by shortUrl  then should"
+          + " return UrlResponseDTO")
+  @Test
+  @Order(3)
+  void testGivenShortUrl_WhenFindByShortUrl_ThenShouldReturnUrlResponseDTO() {
+
+    ResponseOptions<?> response =
+        given()
+            .spec(requestSpecification)
+            .redirects()
+            .follow(false)
+            .when()
+            .get("/{shortUrl}", urlResponseDTO.getShortUrl())
+            .andReturn();
+
+    assertEquals(response.statusCode(), HttpStatus.FOUND.value());
+    assertEquals(urlResponseDTO.getOriginalUrl(), response.header("Location"));
   }
 }
