@@ -3,10 +3,11 @@ package com.challenge.urlshortener.integrationtests.controllers;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.challenge.urlshortener.config.CustomLocalDateTimeSerializable;
+import com.challenge.urlshortener.config.SingletonObjectMapperConfig;
 import com.challenge.urlshortener.config.TestConfigs;
 import com.challenge.urlshortener.domain.dto.UrlRequestDTO;
 import com.challenge.urlshortener.domain.dto.UrlResponseDTO;
+import com.challenge.urlshortener.domain.dto.UrlStatsDTO;
 import com.challenge.urlshortener.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -15,14 +16,11 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.ResponseOptions;
 import io.restassured.specification.RequestSpecification;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.module.SimpleModule;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -37,21 +35,9 @@ class UrlControllerTest extends AbstractIntegrationTest {
   @BeforeAll
   public static void setup() {
 
-    SimpleModule module = new SimpleModule();
-
-    module.addDeserializer(
-        LocalDateTime.class,
-        CustomLocalDateTimeSerializable.CUSTOM_LOCAL_DATE_TIME_DESERIALIZER);
-
-    module.addSerializer(
-        LocalDateTime.class,
-        CustomLocalDateTimeSerializable.CUSTOM_LOCAL_DATE_TIME_SERIALIZER);
-
     faker = new Faker();
 
-    mapper = new ObjectMapper();
-    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    mapper.registerModule(module);
+    mapper = SingletonObjectMapperConfig.getInstance();
 
     requestSpecification =
         new RequestSpecBuilder()
@@ -157,5 +143,35 @@ class UrlControllerTest extends AbstractIntegrationTest {
 
     assertEquals(response.statusCode(), HttpStatus.FOUND.value());
     assertEquals(urlResponseDTO.getOriginalUrl(), response.header("Location"));
+  }
+
+  @DisplayName(
+      "Integration test given shortUrl when get url stats then should return"
+          + " UrlStatsDTO")
+  @Test
+  @Order(4)
+  void
+      integrationTestGivenShortUrl_WhenGetUrlStats_ThenShouldReturnUrlStatsDTO()
+          throws IOException {
+
+    // Given / Arrange
+    ResponseOptions<?> response =
+        given()
+            .spec(requestSpecification)
+            .when()
+            .get("/{shortUrl}/stats", urlResponseDTO.getShortUrl())
+            .andReturn();
+
+    // When / Act
+    UrlStatsDTO statsDTO =
+        mapper.readValue(response.body().asString(), UrlStatsDTO.class);
+
+    // Then / Assert
+    assertNotNull(statsDTO);
+    assertNotNull(statsDTO.getOriginalUrl());
+    assertNotNull(statsDTO.getShortenedUrl());
+    assertNotNull(statsDTO.getAccessLogs());
+
+    assertEquals(1, statsDTO.getAccessLogs().size());
   }
 }
