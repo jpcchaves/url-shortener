@@ -98,4 +98,43 @@ class UrlControllerTest extends AbstractIntegrationTest {
     assertEquals(
         urlRequestDTO.getOriginalUrl(), urlResponseDTO.getOriginalUrl());
   }
+
+  @DisplayName(
+      "Integration test given UrlRequestDTO when update url then should return"
+          + " updated UrlResponseDTO")
+  @Test
+  @Order(2)
+  void
+      integrationTestGivenUrlRequestDTO_WhenUpdateURL_ThenShouldReturnUpdatedUrlResponseDTO()
+          throws IOException {
+    System.out.println(urlResponseDTO);
+    urlRequestDTO = new UrlRequestDTO(faker.internet().url());
+
+    String requestBody =
+        given()
+            .spec(requestSpecification)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .body(urlRequestDTO)
+            .when()
+            .put("/{urlId}", urlResponseDTO.getId())
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .body()
+            .asString();
+
+    urlResponseDTO = mapper.readValue(requestBody, UrlResponseDTO.class);
+
+    assertNotNull(requestBody);
+
+    assertNotNull(urlResponseDTO.getId());
+    assertNotNull(urlResponseDTO.getOriginalUrl());
+    assertNotNull(urlResponseDTO.getShortUrl());
+    assertNotNull(urlResponseDTO.getCreatedAt());
+
+    assertTrue(urlResponseDTO.getId() > 0);
+
+    assertEquals(
+        urlRequestDTO.getOriginalUrl(), urlResponseDTO.getOriginalUrl());
+  }
 }
