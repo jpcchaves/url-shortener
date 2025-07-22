@@ -8,35 +8,39 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.module.SimpleMod
 
 public class SingletonObjectMapperConfig extends ObjectMapper {
 
-  private static final ObjectMapper INSTANCE = new ObjectMapper();
+  private static ObjectMapper INSTANCE;
 
   private SingletonObjectMapperConfig() {}
 
   public static ObjectMapper getInstance() {
 
-    SimpleModule module = new SimpleModule();
+    if (INSTANCE == null) {
+      INSTANCE = new ObjectMapper();
 
-    module.addDeserializer(
-        LocalDateTime.class,
-        CustomLocalDateTimeSerializableConfig
-            .CUSTOM_LOCAL_DATE_TIME_DESERIALIZER);
+      SimpleModule module = new SimpleModule();
 
-    module.addSerializer(
-        LocalDateTime.class,
-        CustomLocalDateTimeSerializableConfig
-            .CUSTOM_LOCAL_DATE_TIME_SERIALIZER);
+      module.addDeserializer(
+          LocalDateTime.class,
+          CustomLocalDateTimeSerializableConfig
+              .CUSTOM_LOCAL_DATE_TIME_DESERIALIZER);
 
-    module.addDeserializer(
-        LocalDate.class,
-        CustomLocalDateTimeSerializableConfig.CUSTOM_LOCAL_DATE_DESERIALIZER);
+      module.addSerializer(
+          LocalDateTime.class,
+          CustomLocalDateTimeSerializableConfig
+              .CUSTOM_LOCAL_DATE_TIME_SERIALIZER);
 
-    module.addSerializer(
-        LocalDate.class,
-        CustomLocalDateTimeSerializableConfig.CUSTOM_LOCAL_DATE_SERIALIZER);
+      module.addDeserializer(
+          LocalDate.class,
+          CustomLocalDateTimeSerializableConfig.CUSTOM_LOCAL_DATE_DESERIALIZER);
 
-    INSTANCE.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      module.addSerializer(
+          LocalDate.class,
+          CustomLocalDateTimeSerializableConfig.CUSTOM_LOCAL_DATE_SERIALIZER);
 
-    INSTANCE.registerModule(module);
+      INSTANCE.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+      INSTANCE.registerModule(module);
+    }
 
     return INSTANCE;
   }
